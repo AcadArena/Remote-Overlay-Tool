@@ -8,11 +8,12 @@ import {
 const Theme: React.FC = ({ children }) => {
   const theme = responsiveFontSizes(
     createMuiTheme({
+      spacing: 5,
       palette: {
         warning: {
           main: "#d13639",
         },
-        type: "dark",
+        // type: "dark",
         primary: {
           main: "#004fff  ",
         },
