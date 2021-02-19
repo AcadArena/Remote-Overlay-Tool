@@ -4,7 +4,8 @@ import { Route, Switch } from "react-router-dom";
 import Button from "./comps/layout/Button";
 import InnerNav from "./comps/layout/InnerNav";
 import Nav from "./comps/layout/Nav";
-import Control from "./views/dashboard/Control";
+import Control from "./views/control/Control";
+import TextFieldsPage from "./views/textfields/TextFieldsPage";
 
 const makeComponentStyles = makeStyles((theme) => ({
   app: {
@@ -38,6 +39,9 @@ function App() {
             <Route exact path="/dashboard"></Route>
             <Route exact path="/schedule"></Route>
             <Route exact path="/bracket"></Route>
+            <Route exact path="/textfields">
+              <TextFieldsPage />
+            </Route>
             <Route exact path="/control">
               <Control />
             </Route>
