@@ -36,6 +36,7 @@ const RadioButton: React.FC<RadioButtonProps> = ({
   checked,
   fullWidth,
   onClick,
+  children,
   ...props
 }) => {
   const classes = makeCompStyles({ fullWidth });
@@ -55,6 +56,7 @@ const RadioButton: React.FC<RadioButtonProps> = ({
       <Typography align="center" className={classes.label}>
         {label}
       </Typography>
+      {children}
     </Paper>
   );
 };
