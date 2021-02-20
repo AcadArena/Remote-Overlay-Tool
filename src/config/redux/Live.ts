@@ -1,4 +1,4 @@
-import { Live } from "../types";
+import { Live } from "../types/types";
 import { types, Action } from "./Actions";
 
 const live: Live = {};
