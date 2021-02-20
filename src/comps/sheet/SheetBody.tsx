@@ -7,9 +7,13 @@ const makeComponentStyles = makeStyles((theme) => ({
   },
 }));
 
-const SheetBody: React.FC = ({ children }) => {
+const SheetBody: React.FC = ({ children, ...props }) => {
   const classes = makeComponentStyles();
-  return <div className={classes.sheetBody}>{children}</div>;
+  return (
+    <div className={classes.sheetBody} {...props}>
+      {children}
+    </div>
+  );
 };
 
 export default SheetBody;
