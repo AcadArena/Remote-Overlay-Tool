@@ -18,10 +18,10 @@ const projectStorage = firebase.storage();
 const projectFirestore = firebase.firestore();
 const projectAuth = firebase.auth();
 
-if (window.location.hostname === "localhost") {
-  projectFirestore.useEmulator("localhost", 8080);
-  projectAuth.useEmulator("http://localhost:9099/");
-}
+// if (window.location.hostname === "localhost") {
+//   projectFirestore.useEmulator("localhost", 8080);
+//   projectAuth.useEmulator("http://localhost:9099/");
+// }
 
 export default firebase;
 export { projectStorage, projectFirestore, projectAuth };
