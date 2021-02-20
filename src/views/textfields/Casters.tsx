@@ -1,12 +1,18 @@
-import React from "react";
+import React, { MouseEvent } from "react";
 
 import {
   makeStyles,
   Button,
   Dialog,
   ButtonBase,
-  IconButton,
   Fab,
+  CircularProgress,
+  Avatar,
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@material-ui/core";
 import Sheet from "../../comps/sheet/Sheet";
 import SheetBody from "../../comps/sheet/SheetBody";
@@ -21,8 +27,12 @@ import fbase, {
 import SheetFooter from "../../comps/sheet/SheetFooter";
 import TextField from "../../comps/textfield/TextField";
 import AddIcon from "@material-ui/icons/Add";
+import CheckIcon from "@material-ui/icons/Check";
 import SaveOutlinedIcon from "@material-ui/icons/SaveOutlined";
-
+import MoreVertIcon from "@material-ui/icons/MoreVert";
+import CloudOutlinedIcon from "@material-ui/icons/CloudOutlined";
+import { green } from "@material-ui/core/colors";
+import { DeleteForever } from "@material-ui/icons";
 interface Caster {
   name: string;
   ign: string;
@@ -40,12 +50,35 @@ const makeComponentStyles = makeStyles((theme) => ({
     displayt: "flex",
     flexDirection: "column",
   },
+  caster: {
+    padding: theme.spacing(2, 3),
+    marginBottom: theme.spacing(3),
+    border: "1px solid rgba(0,0,0,.1)",
+    borderRadius: 3,
+    display: "flex",
+    alignItems: "center",
+
+    "& .info": {
+      display: "flex",
+      flexDirection: "column",
+      margin: theme.spacing(0, 3),
+      flex: 1,
+
+      "& .name": {
+        fontSize: 12,
+      },
+
+      "& .ign": {
+        fontWeight: 400,
+      },
+    },
+  },
 }));
 
 const Casters: React.FC = () => {
   const [form, setForm] = React.useState<CastersProps>({ list: [] });
   const [addState, setAddState] = React.useState<boolean>(false);
-  const [casters, loader] = useDocumentData<CastersProps>(
+  const [casters, loading] = useDocumentData<CastersProps>(
     db.collection("live").doc("casters")
   );
 
@@ -56,15 +89,36 @@ const Casters: React.FC = () => {
 
   const classes = makeComponentStyles();
 
+  const openEditDialog = () => {};
+
+  const deleteCaster = (caster: Caster) => {
+    db.collection("live")
+      .doc("casters")
+      .update({
+        list: fbase.firestore.FieldValue.arrayRemove(caster),
+      });
+  };
+
   return (
-    <Sheet>
+    <Sheet loading={loading}>
       <SheetHead color="green">
         <SheetHeadTitle>Casters</SheetHeadTitle>
       </SheetHead>
       <SheetBody>
         <div className={classes.casters}>
           {casters?.list.map((caster) => (
-            <div>{caster.name}</div>
+            <div key={caster.ign} className={classes.caster}>
+              <Avatar src={caster.photo} />
+              <div className="info">
+                <div className="ign">{caster.ign}</div>
+                <div className="name">{caster.name}</div>
+              </div>
+              <MenuButton
+                caster={caster}
+                editCaster={openEditDialog}
+                deleteCaster={deleteCaster}
+              />
+            </div>
           ))}
         </div>
 
@@ -76,7 +130,9 @@ const Casters: React.FC = () => {
           Add
         </Button>
       </SheetBody>
-      <SheetFooter></SheetFooter>
+      <SheetFooter>
+        <CloudOutlinedIcon /> Saved Online
+      </SheetFooter>
       <AddDialog open={addState} onClose={() => setAddState(false)}></AddDialog>
     </Sheet>
   );
@@ -121,6 +177,17 @@ const makeDialogStyles = makeStyles((theme) => ({
       flex: 1,
     },
   },
+  fabWrapper: {
+    margin: theme.spacing(1),
+    position: "relative",
+  },
+  fabProgress: {
+    color: green[500],
+    position: "absolute",
+    top: -6,
+    left: -6,
+    zIndex: 1,
+  },
 }));
 
 const fileTypes = [
@@ -140,6 +207,8 @@ const AddDialog: React.FC<AddDialog> = ({ open, onClose }) => {
     photo: false,
     photo_upload_progress: 0,
   });
+  const [saveLoading, setSaveLoading] = React.useState<boolean>(false);
+  const [success, setSuccess] = React.useState<boolean>(false);
 
   const [form, setForm] = React.useState<Caster>({
     name: "",
@@ -216,31 +285,54 @@ const AddDialog: React.FC<AddDialog> = ({ open, onClose }) => {
   };
 
   const save = () => {
+    setSaveLoading(true);
     db.collection("live")
       .doc("casters")
-      .update({
-        list: fbase.firestore.FieldValue.arrayUnion(form),
-      })
+      .set(
+        {
+          list: fbase.firestore.FieldValue.arrayUnion(form),
+        },
+        { merge: true }
+      )
       .then(() => {
-        onClose();
+        setSaveLoading(false);
+        closeRemarks();
       });
+  };
+
+  const closeRemarks = () => {
+    setForm({ name: "", ign: "", photo: "", photo_ref: "" });
+    onClose();
   };
 
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={closeRemarks}
       maxWidth="xs"
       fullWidth
       classes={{ paper: classes.dialogPaper }}
     >
-      <Sheet>
+      <Sheet loading={loader.photo}>
         <SheetHead icon={<AddIcon fontSize="large" />}>
           <div className={classes.headWrapper}>
             <SheetHeadTitle>Add Caster</SheetHeadTitle>
-            <Fab color="primary" onClick={save}>
-              <SaveOutlinedIcon fontSize="large"></SaveOutlinedIcon>
-            </Fab>
+            <div className={classes.fabWrapper}>
+              <Fab
+                color="primary"
+                onClick={save}
+                disabled={!Boolean(form.name) || !Boolean(form.ign)}
+              >
+                {success ? (
+                  <CheckIcon fontSize="large" />
+                ) : (
+                  <SaveOutlinedIcon fontSize="large" />
+                )}
+              </Fab>
+              {saveLoading && (
+                <CircularProgress size={68} className={classes.fabProgress} />
+              )}
+            </div>
           </div>
         </SheetHead>
         <SheetBody>
@@ -267,13 +359,72 @@ const AddDialog: React.FC<AddDialog> = ({ open, onClose }) => {
                 style={{ marginTop: 0 }}
                 disabled={loader.photo}
                 fullWidth
+                name="name"
                 label="Name"
+                onChange={handleChange}
               />
-              <TextField fullWidth label="IGN" disabled={loader.photo} />
+              <TextField
+                fullWidth
+                label="IGN"
+                name="ign"
+                disabled={loader.photo}
+                onChange={handleChange}
+              />
             </div>
           </div>
         </SheetBody>
       </Sheet>
     </Dialog>
+  );
+};
+
+interface MenuButtonProps {
+  editCaster: () => void;
+  deleteCaster: (caster: Caster) => void;
+  caster: Caster;
+}
+
+const MenuButton: React.FC<MenuButtonProps> = ({
+  caster,
+  editCaster,
+  deleteCaster,
+}) => {
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
+    null
+  );
+
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  return (
+    <div>
+      <IconButton
+        size="small"
+        aria-controls="simple-menu"
+        aria-haspopup="true"
+        onClick={handleClick}
+      >
+        <MoreVertIcon />
+      </IconButton>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+        anchorOrigin={{ horizontal: "right", vertical: "top" }}
+        transformOrigin={{
+          horizontal: "right",
+          vertical: "top",
+        }}
+      >
+        <MenuItem onClick={() => deleteCaster(caster)}>
+          <ListItemIcon>
+            <DeleteForever />
+          </ListItemIcon>
+          <ListItemText>Delete {caster.ign}</ListItemText>
+        </MenuItem>
+      </Menu>
+    </div>
   );
 };
