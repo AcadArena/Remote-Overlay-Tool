@@ -1,7 +1,9 @@
 import React from "react";
 import AppBar from "@material-ui/core/AppBar";
 import { RouteComponentProps, withRouter } from "react-router-dom";
-import { makeStyles, Toolbar, Typography } from "@material-ui/core";
+import { Button, makeStyles, Toolbar, Typography } from "@material-ui/core";
+import { useSelector } from "react-redux";
+import { ReduxState } from "../../config/types/types";
 
 interface RouteMap {
   [key: string]: string;
@@ -9,9 +11,11 @@ interface RouteMap {
 
 const routeMap: RouteMap = {
   bracket: "Bracket",
-  dashboard: "Dashboard",
+  participants: "Participants",
   control: "Control Panel",
   schedule: "Stream Schedule",
+  settings: "Settings",
+  tournaments: "Tournaments",
 };
 
 const makeComponentStyles = makeStyles((theme) => ({
@@ -19,21 +23,40 @@ const makeComponentStyles = makeStyles((theme) => ({
     boxShadow: "none",
     "& .page-title": {
       fontWeight: 300,
-      fontSize: 18,
+      // fontSize: 18,
       padding: theme.spacing(0, 3),
+      display: "flex",
+      alignItems: "center",
+      "& .tournament": {
+        // marginRight: theme.spacing(2),
+        padding: theme.spacing(2, 1),
+      },
     },
   },
 }));
 
 const InnerNav: React.FC<RouteComponentProps> = ({
   location: { pathname },
+  history,
 }) => {
   const classes = makeComponentStyles();
+
+  const { tournament } = useSelector((state: ReduxState) => state.live);
   return (
     <AppBar position="static" color="transparent" className={classes.appbar}>
       <Toolbar>
-        <Typography variant="h5" className="page-title">
-          {routeMap[pathname.split("/")[1]]}
+        <Typography variant="button" className="page-title">
+          {Boolean(tournament?.url) &&
+            pathname.split("/")[1] !== "tournaments" && (
+              <Button
+                className="tournament"
+                color="primary"
+                onClick={() => history.push("/tournaments")}
+              >
+                {tournament?.url}
+              </Button>
+            )}
+          / {routeMap[pathname.split("/")[1]]}
         </Typography>
       </Toolbar>
     </AppBar>

@@ -1,11 +1,16 @@
-import { makeStyles } from "@material-ui/core";
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Redirect, Route, Switch } from "react-router-dom";
+
+import { useSelector } from "react-redux";
+
+import { makeStyles } from "@material-ui/core";
 import Button from "./comps/layout/Button";
 import InnerNav from "./comps/layout/InnerNav";
 import Nav from "./comps/layout/Nav";
 import Control from "./views/control/Control";
-import TextFieldsPage from "./views/textfields/TextFieldsPage";
+import Settings from "./views/settings/Settings";
+import { ReduxState } from "./config/types/types";
+import Tournaments from "./views/tournaments/Tournaments";
 
 const makeComponentStyles = makeStyles((theme) => ({
   app: {
@@ -29,24 +34,39 @@ const makeComponentStyles = makeStyles((theme) => ({
 
 function App() {
   const classes = makeComponentStyles();
+
+  const { tournament } = useSelector((state: ReduxState) => state.live);
+
   return (
     <div className={classes.app}>
       <Nav />
       <div className={classes.mainPanel}>
-        <InnerNav />
-        <div className="content">
-          <Switch>
-            <Route exact path="/dashboard"></Route>
-            <Route exact path="/schedule"></Route>
-            <Route exact path="/bracket"></Route>
-            <Route exact path="/textfields">
-              <TextFieldsPage />
-            </Route>
-            <Route exact path="/control">
-              <Control />
-            </Route>
-          </Switch>
-        </div>
+        {tournament ? (
+          <>
+            <InnerNav />
+            <div className="content">
+              <Switch>
+                <Route exact path="/tournaments">
+                  <Tournaments />
+                </Route>
+                <Route exact path="/participants"></Route>
+                <Route exact path="/schedule"></Route>
+                <Route exact path="/bracket"></Route>
+                <Route exact path="/settings">
+                  <Settings />
+                </Route>
+                <Route exact path="/control">
+                  <Control />
+                </Route>
+              </Switch>
+            </div>
+          </>
+        ) : (
+          <>
+            <Redirect to="/tournaments" />
+            <Tournaments />
+          </>
+        )}
       </div>
     </div>
   );
