@@ -16,15 +16,13 @@ import { wsContext } from "../../config/websocket/WebsocketProvider";
 import SheetSection from "../../comps/sheet/SheetSection";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { projectFirestore as db } from "../../config/firebase/config";
-
-interface LowerThirdsProp {
-  headline: string;
-  ticker: string;
-  live: boolean;
-}
+import PowerOutlinedIcon from "@material-ui/icons/PowerOutlined";
+import RadioButton from "../../comps/radiobutton/RadioButton";
+import RadioButtonContainer from "../../comps/radiobutton/RadioButtonContainer";
+import { Live, LowerThirds } from "../../config/types";
 
 const ControlLowerThirds = () => {
-  const [form, setForm] = React.useState<LowerThirdsProp>({
+  const [form, setForm] = React.useState<LowerThirds>({
     headline: "",
     ticker: "",
     live: false,
@@ -32,10 +30,12 @@ const ControlLowerThirds = () => {
   const ws = React.useContext(wsContext);
   const [data] = useDocumentData(db.collection("live").doc("casters"));
 
-  const { lowerThirds } = useSelector((state: any) => state.live);
+  const live: Live = useSelector((state: any) => state.live);
+  const { lowerThirds } = live;
 
   React.useEffect(() => {
     if (!lowerThirds) return;
+    if (form === lowerThirds) return;
     setForm(lowerThirds);
   }, [lowerThirds, setForm]);
 
@@ -49,6 +49,10 @@ const ControlLowerThirds = () => {
     setForm({ ...form, [e.currentTarget.name]: e.currentTarget.value });
   };
 
+  const toggleLowerThirds = () => {
+    ws.setLiveSettings({ lowerThirds: { ...form, live: !form.live } });
+  };
+
   return (
     <Sheet>
       <SheetHead color="violet">
@@ -56,10 +60,24 @@ const ControlLowerThirds = () => {
         {/* <SheetHeadSub>Subtitle</SheetHeadSub> */}
       </SheetHead>
       <SheetBody>
-        {/* Long Bar */}
+        {/* Control */}
+        <SheetSection>
+          <Typography variant="h4">Control</Typography>
+          <RadioButtonContainer>
+            <RadioButton
+              checked={form.live}
+              label="Lower Thirds"
+              onClick={toggleLowerThirds}
+            />
+            <RadioButton checked={true} label="test" />
+            <RadioButton checked={true} label="test" />
+          </RadioButtonContainer>
+        </SheetSection>
+
+        {/* Details */}
         <SheetSection>
           <div className="">
-            <Typography variant="h4">Long Bar</Typography>
+            <Typography variant="h4">Details</Typography>
           </div>
           <Grid container spacing={2}>
             {/* Headline */}
@@ -99,11 +117,11 @@ const ControlLowerThirds = () => {
             Apply Changes
           </Button>
         </SheetSection>
-
-        {/* Talents */}
-        <SheetSection></SheetSection>
       </SheetBody>
-      <SheetFooter>footer</SheetFooter>
+      <SheetFooter>
+        <PowerOutlinedIcon />
+        Websocket only. Not Saved Online.
+      </SheetFooter>
     </Sheet>
   );
 };
