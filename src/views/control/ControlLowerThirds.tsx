@@ -5,11 +5,8 @@ import { useSelector } from "react-redux";
 import Sheet from "../../comps/sheet/Sheet";
 import SheetHead from "../../comps/sheet/SheetHead";
 import SheetHeadTitle from "../../comps/sheet/SheetHeadTitle";
-import SheetHeadSub from "../../comps/sheet/SheetHeadSub";
-import AccessAlarmsIcon from "@material-ui/icons/AccessAlarms";
 import SheetBody from "../../comps/sheet/SheetBody";
 import SheetFooter from "../../comps/sheet/SheetFooter";
-import CallToActionIcon from "@material-ui/icons/CallToAction";
 import TextField from "../../comps/textfield/TextField";
 import { Typography, Grid, Button } from "@material-ui/core";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
@@ -19,7 +16,7 @@ import { projectFirestore as db } from "../../config/firebase/config";
 import PowerOutlinedIcon from "@material-ui/icons/PowerOutlined";
 import RadioButton from "../../comps/radiobutton/RadioButton";
 import RadioButtonContainer from "../../comps/radiobutton/RadioButtonContainer";
-import { Live, LowerThirds } from "../../config/types";
+import { LowerThirds, ReduxState } from "../../config/types/types";
 
 const ControlLowerThirds = () => {
   const [form, setForm] = React.useState<LowerThirds>({
@@ -30,7 +27,7 @@ const ControlLowerThirds = () => {
   const ws = React.useContext(wsContext);
   const [data] = useDocumentData(db.collection("live").doc("casters"));
 
-  const live: Live = useSelector((state: any) => state.live);
+  const live = useSelector((state: ReduxState) => state.live);
   const { lowerThirds } = live;
 
   React.useEffect(() => {
