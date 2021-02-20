@@ -24,8 +24,10 @@ import fbase, {
   projectFirestore as db,
   projectStorage,
 } from "../../config/firebase/config";
+import { useSelector } from "react-redux";
 import SheetFooter from "../../comps/sheet/SheetFooter";
 import TextField from "../../comps/textfield/TextField";
+
 import AddIcon from "@material-ui/icons/Add";
 import CheckIcon from "@material-ui/icons/Check";
 import SaveOutlinedIcon from "@material-ui/icons/SaveOutlined";
@@ -33,13 +35,13 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import CloudOutlinedIcon from "@material-ui/icons/CloudOutlined";
 import { green } from "@material-ui/core/colors";
 import { DeleteForever } from "@material-ui/icons";
+import { ReduxState } from "../../config/types/types";
 interface Caster {
   name: string;
   ign: string;
   photo: string;
   photo_ref: string;
 }
-
 interface CastersProps {
   list: Caster[];
 }
@@ -73,13 +75,16 @@ const makeComponentStyles = makeStyles((theme) => ({
       },
     },
   },
+  noCaster: { padding: theme.spacing(0, 0, 2, 0) },
 }));
 
 const Casters: React.FC = () => {
   const [form, setForm] = React.useState<CastersProps>({ list: [] });
   const [addState, setAddState] = React.useState<boolean>(false);
-  const [casters, loading] = useDocumentData<CastersProps>(
-    db.collection("live").doc("casters")
+  const { tournament } = useSelector((state: ReduxState) => state.live);
+  const tournamentRef = db.collection("tournaments").doc(tournament?.url);
+  const [casters, loading, error] = useDocumentData<CastersProps>(
+    tournamentRef.collection("live").doc("casters")
   );
 
   React.useEffect(() => {
@@ -106,20 +111,26 @@ const Casters: React.FC = () => {
       </SheetHead>
       <SheetBody>
         <div className={classes.casters}>
-          {casters?.list.map((caster) => (
-            <div key={caster.ign} className={classes.caster}>
-              <Avatar src={caster.photo} />
-              <div className="info">
-                <div className="ign">{caster.ign}</div>
-                <div className="name">{caster.name}</div>
+          {casters?.list.length ? (
+            casters?.list.map((caster) => (
+              <div key={caster.ign} className={classes.caster}>
+                <Avatar src={caster.photo} />
+                <div className="info">
+                  <div className="ign">{caster.ign}</div>
+                  <div className="name">{caster.name}</div>
+                </div>
+                <MenuButton
+                  caster={caster}
+                  editCaster={openEditDialog}
+                  deleteCaster={deleteCaster}
+                />
               </div>
-              <MenuButton
-                caster={caster}
-                editCaster={openEditDialog}
-                deleteCaster={deleteCaster}
-              />
+            ))
+          ) : (
+            <div className={classes.noCaster}>
+              No caster Yet for this tournament
             </div>
-          ))}
+          )}
         </div>
 
         <Button
@@ -133,7 +144,11 @@ const Casters: React.FC = () => {
       <SheetFooter>
         <CloudOutlinedIcon /> Saved Online
       </SheetFooter>
-      <AddDialog open={addState} onClose={() => setAddState(false)}></AddDialog>
+      <AddDialog
+        open={addState}
+        onClose={() => setAddState(false)}
+        tournamentRef={tournamentRef}
+      ></AddDialog>
     </Sheet>
   );
 };
@@ -143,6 +158,7 @@ export default Casters;
 interface AddDialog {
   open: boolean;
   onClose: () => void;
+  tournamentRef: fbase.firestore.DocumentReference;
 }
 
 const makeDialogStyles = makeStyles((theme) => ({
@@ -198,7 +214,7 @@ const fileTypes = [
   "image/svg+xml",
 ];
 
-const AddDialog: React.FC<AddDialog> = ({ open, onClose }) => {
+const AddDialog: React.FC<AddDialog> = ({ open, onClose, tournamentRef }) => {
   const classes = makeDialogStyles();
   const [loader, setLoader] = React.useState<{
     photo: boolean;
@@ -286,7 +302,8 @@ const AddDialog: React.FC<AddDialog> = ({ open, onClose }) => {
 
   const save = () => {
     setSaveLoading(true);
-    db.collection("live")
+    tournamentRef
+      .collection("live")
       .doc("casters")
       .set(
         {
