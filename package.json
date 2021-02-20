@@ -12,11 +12,17 @@
     "@types/node": "^12.20.1",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
+    "clsx": "^1.1.1",
     "firebase": "^8.2.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-firebase-hooks": "^2.2.0",
+    "react-redux": "^7.2.2",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.2",
+    "redux": "^4.0.5",
+    "socket.io-client": "^3.1.1",
+    "sweetalert": "^2.1.2",
     "typescript": "^4.1.5",
     "web-vitals": "^1.1.0"
   },
@@ -45,6 +51,12 @@
     ]
   },
   "devDependencies": {
-    "@types/react-router-dom": "^5.1.7"
+    "@types/material-ui": "^0.21.8",
+    "@types/react-redux": "^7.1.16",
+    "@types/react-router-dom": "^5.1.7",
+    "@types/react-tap-event-plugin": "0.0.30",
+    "@types/socket.io": "^2.1.13",
+    "@types/socket.io-client": "^1.4.35",
+    "redux-devtools-extension": "^2.13.8"
   }
 }

@@ -1,7 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
-import "firebase/auth";
+import "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAk41bDSo6VrVI2JhxJ-7mak3qN9bkVDFA",
@@ -18,11 +18,10 @@ const projectStorage = firebase.storage();
 const projectFirestore = firebase.firestore();
 const projectAuth = firebase.auth();
 
-if (window.location.hostname === "localhost") {
-  console.log("running on local firestore");
-  projectFirestore.useEmulator("localhost", 8080);
-  projectAuth.useEmulator("http://localhost:9099/");
-}
+// if (window.location.hostname === "localhost") {
+//   projectFirestore.useEmulator("localhost", 8080);
+//   projectAuth.useEmulator("http://localhost:9099/");
+// }
 
 export default firebase;
 export { projectStorage, projectFirestore, projectAuth };
