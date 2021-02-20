@@ -1,9 +1,7 @@
+import { Live } from "../types";
 import { types, Action } from "./Actions";
 
-export interface Live {
-  [key: string]: any;
-}
-const live = {};
+const live: Live = {};
 
 const LiveReducers = (state = live, action: Action) => {
   switch (action.type) {
