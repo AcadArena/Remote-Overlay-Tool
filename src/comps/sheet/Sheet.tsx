@@ -1,9 +1,11 @@
 import React from "react";
 import { makeStyles, Paper } from "@material-ui/core";
 import SheetHead from "./SheetHead";
+import LinearProgress from "@material-ui/core/LinearProgress";
 
 interface Sheet {
-  icon?: React.ReactElement;
+  loading?: boolean;
+  [key: string]: any;
 }
 
 const makeComponentStyles = makeStyles((theme) => ({
@@ -14,14 +16,22 @@ const makeComponentStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
   },
+  loader: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
 }));
 
-const Sheet: React.FC<Sheet> = ({ children, ...props }) => {
+const Sheet: React.FC<Sheet> = ({ loading, children, ...props }) => {
   const classes = makeComponentStyles();
 
   return (
     <Paper className={classes.sheet} {...props}>
       {children}
+
+      {loading && <LinearProgress className={classes.loader} />}
     </Paper>
   );
 };
