@@ -11,8 +11,15 @@ interface WebsocketProps {
 export const wsContext = createContext<WebsocketProps>({
   setLiveSettings: () => {},
 });
-// const host = "https://rot-websocket-server.herokuapp.com/";
-const host = "localhost:3200";
+let host: string = "";
+const hostCloud: string = "https://rot-websocket-server.herokuapp.com/";
+const hostLocal: string = "localhost:3200";
+
+if (window.location.hostname === "localhost") {
+  host = hostLocal;
+} else {
+  host = hostCloud;
+}
 
 const WebsocketProvider: React.FC = ({ children }) => {
   let socket: any;
