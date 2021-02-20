@@ -11,6 +11,7 @@ import Control from "./views/control/Control";
 import Settings from "./views/settings/Settings";
 import { ReduxState } from "./config/types/types";
 import Tournaments from "./views/tournaments/Tournaments";
+import ParticipantsPage from "./views/participants/ParticipantsPage";
 
 const makeComponentStyles = makeStyles((theme) => ({
   app: {
@@ -49,7 +50,9 @@ function App() {
                 <Route exact path="/tournaments">
                   <Tournaments />
                 </Route>
-                <Route exact path="/participants"></Route>
+                <Route exact path="/participants">
+                  <ParticipantsPage />
+                </Route>
                 <Route exact path="/schedule"></Route>
                 <Route exact path="/bracket"></Route>
                 <Route exact path="/settings">
