@@ -53,6 +53,12 @@ export interface Participant {
   display_name_with_invitation_email_address: string;
   display_name: string;
   group_player_ids: number[];
+  university_name?: string;
+  university_acronym?: string;
+  org_name?: string;
+  org_acronym?: string;
+  logo?: string;
+  [key: string]: any;
 }
 
 export interface MatchElement {
