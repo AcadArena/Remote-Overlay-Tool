@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  useCollectionData,
-  useDocumentData,
-} from "react-firebase-hooks/firestore";
+import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useSelector } from "react-redux";
 import RadioButtonContainer from "../../comps/radiobutton/RadioButtonContainer";
 import Sheet from "../../comps/sheet/Sheet";
@@ -24,6 +21,7 @@ import {
   Fab,
   CircularProgress,
   TextField,
+  IconButton,
 } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import CheckIcon from "@material-ui/icons/Check";
@@ -32,12 +30,17 @@ import { green } from "@material-ui/core/colors";
 import RadioButton from "../../comps/radiobutton/RadioButton";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
 import SheetFooter from "../../comps/sheet/SheetFooter";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 
 const makeCompStyles = makeStyles((theme) => ({
   tournamentsContainer: {},
   sheetBody: {
     display: "flex",
     flexDirection: "column",
+  },
+  deleteBtn: {
+    fontSize: 12,
+    margin: theme.spacing(1),
   },
 }));
 
@@ -71,6 +74,31 @@ const Tournaments = () => {
     ws.setLiveSettings({ tournament: t });
   };
 
+  const deleteTournament = (t: Tournament) => () => {
+    swal({
+      title: "Are you sure?",
+      text: `Delete Tournament: ${t.url}`,
+      dangerMode: true,
+      icon: "warning",
+      buttons: ["Ples dont", true],
+    }).then((value) => {
+      if (value) {
+        if (t === tournament) {
+          ws.setLiveSettings({ tournament: undefined });
+        }
+        db.collection("tournaments")
+          .doc(t.uid)
+          .delete()
+          .then(() => {
+            swal({
+              title: "Successfully deleted tournament!",
+              icon: "success",
+            });
+          });
+      }
+    });
+  };
+
   return (
     <div style={{ height: "100%" }}>
       <Grid
@@ -93,11 +121,15 @@ const Tournaments = () => {
                       <RadioButtonContainer>
                         {tournaments.map((t) => (
                           <RadioButton
+                            key={tournament?.id}
                             checked={t.url === selected?.url}
                             label={t.url}
                             onClick={selectTournament(t)}
                           >
-                            <div>Participants: {}</div>
+                            <div>Participants: {t.participants.length}</div>
+                            <IconButton onClick={deleteTournament(t)}>
+                              <DeleteForeverIcon />
+                            </IconButton>
                           </RadioButton>
                         ))}
                       </RadioButtonContainer>
