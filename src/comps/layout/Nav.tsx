@@ -7,6 +7,7 @@ import {
   ListItemIcon,
   ListItemText,
   makeStyles,
+  SvgIcon,
 } from "@material-ui/core";
 import GamesIcon from "@material-ui/icons/Games";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
@@ -14,6 +15,7 @@ import ScheduleIcon from "@material-ui/icons/Schedule";
 import GroupIcon from "@material-ui/icons/Group";
 import SettingsIcon from "@material-ui/icons/Settings";
 import StorageIcon from "@material-ui/icons/Storage";
+import { ReactComponent as BattleIcon } from "../assets/battle.svg";
 
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import clsx from "clsx";
@@ -69,8 +71,20 @@ const makeComponentStyles = makeStyles((theme) => ({
 const navData = [
   { title: "Tournaments", url: "/tournaments", icon: <StorageIcon /> },
   { title: "Participants", url: "/participants", icon: <GroupIcon /> },
-  { title: "Schedule", url: "/schedule", icon: <ScheduleIcon /> },
-  { title: "Bracket", url: "/bracket", icon: <AccountTreeIcon /> },
+  {
+    title: "Matches",
+    url: "/matches",
+    icon: (
+      <SvgIcon>
+        <BattleIcon />
+      </SvgIcon>
+    ),
+  },
+  {
+    title: "Bracket",
+    url: "/bracket",
+    icon: <AccountTreeIcon style={{ transform: "scaleX(-1)" }} />,
+  },
   { title: "Settings", url: "/settings", icon: <SettingsIcon /> },
   { title: "Control", url: "/control", icon: <GamesIcon /> },
 ];
