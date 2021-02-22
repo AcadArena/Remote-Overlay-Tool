@@ -4,6 +4,13 @@ export interface ReduxState {
 export interface Live {
   lowerThirds?: LowerThirds;
   tournament?: Tournament;
+  casters?: Caster[];
+}
+
+export interface Caster {
+  ign: string;
+  name: string;
+  photo?: string;
 }
 
 export type Tournaments = Tournament[];
@@ -59,6 +66,15 @@ export interface Participant {
   org_acronym?: string;
   logo?: string;
   [key: string]: any;
+  players?: Player[];
+}
+
+export interface Player {
+  name: string;
+  ign: string;
+  photo_main?: string;
+  photo_sub?: string;
+  photo_profile_shot?: string;
 }
 
 export interface MatchElement {
