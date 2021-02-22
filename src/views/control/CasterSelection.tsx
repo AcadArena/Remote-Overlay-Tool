@@ -10,6 +10,7 @@ import {
 import React from "react";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { useSelector } from "react-redux";
+import { RouteComponentProps, withRouter } from "react-router-dom";
 import Sheet from "../../comps/sheet/Sheet";
 import SheetBody from "../../comps/sheet/SheetBody";
 import SheetFooter from "../../comps/sheet/SheetFooter";
@@ -59,7 +60,7 @@ const makeCompStyles = makeStyles((theme) => ({
   },
 }));
 
-const CasterSelection: React.FC = () => {
+const CasterSelection: React.FC<RouteComponentProps> = ({ history }) => {
   const classes = makeCompStyles();
   const { tournament, casters: castersWS } = useSelector(
     (state: ReduxState) => state.live
@@ -158,16 +159,23 @@ const CasterSelection: React.FC = () => {
           style={{ alignSelf: "center", marginTop: selection?.length ? 0 : 20 }}
           variant="outlined"
           color="primary"
+          disabled={castersWS === selection}
           onClick={apply}
         >
           Apply
         </Button>
       </SheetBody>
       <SheetFooter>
-        The arrangement of the casters depends on who you click first
+        To add / edit / delete casters go to
+        <a
+          onClick={() => history.push("/settings")}
+          style={{ color: "skyblue", cursor: "pointer" }}
+        >
+          &nbsp;settings
+        </a>
       </SheetFooter>
     </Sheet>
   );
 };
 
-export default CasterSelection;
+export default withRouter(CasterSelection);
