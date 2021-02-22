@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { setLiveSettings } from "../redux/Actions";
 import io from "socket.io-client";
 
-interface WebsocketProps {
+export interface WebsocketProps {
   socket?: SocketIOClientStatic;
   setLiveSettings: (settings: any) => void;
 }
