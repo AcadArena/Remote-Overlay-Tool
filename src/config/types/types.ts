@@ -5,6 +5,10 @@ export interface Live {
   lowerThirds?: LowerThirds;
   tournament?: Tournament;
   casters?: Caster[];
+  match?: Match;
+  matches_previous?: Match[];
+  matches_today?: Match[];
+  matches_next?: Match[];
 }
 
 export interface Caster {
@@ -18,7 +22,8 @@ export type Tournaments = Tournament[];
 export interface LowerThirds {
   headline: string;
   ticker: string;
-  live: boolean;
+  live?: boolean;
+  live_casters?: boolean;
 }
 
 export interface Tournament {
@@ -40,11 +45,11 @@ export interface Tournament {
   subdomain: string | null;
   participants_count: number;
   participants: Participant[];
-  matches: MatchElement[];
+  matches: Match[];
 }
 
 export interface ParticipantElement {
-  participant: MatchMatch;
+  participant: Match;
 }
 
 export interface Participant {
@@ -78,10 +83,10 @@ export interface Player {
 }
 
 export interface MatchElement {
-  match: MatchMatch;
+  match: Match;
 }
 
-export interface MatchMatch {
+export interface Match {
   id: number;
   tournament_id: number;
   state: string;
@@ -106,4 +111,5 @@ export interface MatchMatch {
   suggested_play_order: number;
   prerequisite_match_ids_csv: string;
   scores_csv: string;
+  [key: string]: any;
 }
