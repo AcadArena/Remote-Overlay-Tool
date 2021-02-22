@@ -221,7 +221,7 @@ const ParticipantPlayers: React.FC<ParticipantPlayersProps> = ({
           <div className={classes.sheetContainer}>
             {Boolean(participant?.players?.length) ? (
               participant?.players?.map((player: Player, i: number) => (
-                <SheetSection className={classes.player}>
+                <SheetSection className={classes.player} key={player.ign}>
                   <Button
                     component="label"
                     className="photo"
