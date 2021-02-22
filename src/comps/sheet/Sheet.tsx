@@ -5,6 +5,7 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 
 interface Sheet {
   loading?: boolean;
+  className?: string;
   [key: string]: any;
 }
 
@@ -15,6 +16,7 @@ const makeComponentStyles = makeStyles((theme) => ({
     position: "relative",
     display: "flex",
     flexDirection: "column",
+    marginTop: 30,
   },
   loader: {
     position: "absolute",
@@ -24,11 +26,11 @@ const makeComponentStyles = makeStyles((theme) => ({
   },
 }));
 
-const Sheet: React.FC<Sheet> = ({ loading, children, ...props }) => {
+const Sheet: React.FC<Sheet> = ({ loading, children, className, ...props }) => {
   const classes = makeComponentStyles();
 
   return (
-    <Paper className={classes.sheet} {...props}>
+    <Paper className={classes.sheet + " " + className} {...props}>
       {children}
 
       {loading && <LinearProgress className={classes.loader} />}
