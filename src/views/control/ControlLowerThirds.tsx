@@ -25,7 +25,6 @@ const ControlLowerThirds = () => {
     live: false,
   });
   const ws = React.useContext(wsContext);
-  const [data] = useDocumentData(db.collection("live").doc("casters"));
 
   const live = useSelector((state: ReduxState) => state.live);
   const { lowerThirds } = live;
@@ -46,8 +45,8 @@ const ControlLowerThirds = () => {
     setForm({ ...form, [e.currentTarget.name]: e.currentTarget.value });
   };
 
-  const toggleLowerThirds = () => {
-    ws.setLiveSettings({ lowerThirds: { ...form, live: !form.live } });
+  const toggleLowerThirds = (type: "live" | "live_casters") => () => {
+    ws.setLiveSettings({ lowerThirds: { ...form, [type]: !form[type] } });
   };
 
   return (
@@ -62,12 +61,15 @@ const ControlLowerThirds = () => {
           <Typography variant="h4">Control</Typography>
           <RadioButtonContainer>
             <RadioButton
-              checked={form.live}
+              checked={form.live ?? false}
               label="Lower Thirds"
-              onClick={toggleLowerThirds}
+              onClick={toggleLowerThirds("live")}
             />
-            <RadioButton checked={true} label="test" />
-            <RadioButton checked={true} label="test" />
+            <RadioButton
+              checked={form.live_casters ?? false}
+              label="Casters"
+              onClick={toggleLowerThirds("live_casters")}
+            />
           </RadioButtonContainer>
         </SheetSection>
 
@@ -108,6 +110,10 @@ const ControlLowerThirds = () => {
             fullWidth
             variant="contained"
             style={{ marginTop: 10 }}
+            disabled={
+              form.headline === lowerThirds?.headline &&
+              form.ticker === lowerThirds.ticker
+            }
             onClick={apply}
             color="primary"
           >
