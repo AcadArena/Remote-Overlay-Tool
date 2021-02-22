@@ -12,6 +12,7 @@ import Settings from "./views/settings/Settings";
 import { ReduxState } from "./config/types/types";
 import Tournaments from "./views/tournaments/Tournaments";
 import ParticipantsPage from "./views/participants/ParticipantsPage";
+import MatchesPage from "./views/matches/MatchesPage";
 
 const makeComponentStyles = makeStyles((theme) => ({
   app: {
@@ -53,8 +54,10 @@ function App() {
                 <Route exact path="/participants">
                   <ParticipantsPage />
                 </Route>
+                <Route exact path="/matches">
+                  <MatchesPage />
+                </Route>
                 <Route exact path="/schedule"></Route>
-                <Route exact path="/bracket"></Route>
                 <Route exact path="/settings">
                   <Settings />
                 </Route>
