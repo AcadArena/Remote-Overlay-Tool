@@ -310,6 +310,12 @@ const MatchesSelection = () => {
                             className={classes.match}
                             variant="outlined"
                             onClick={selectMatch(match)}
+                            style={{
+                              border:
+                                match.id === matchWS?.id
+                                  ? "1px solid #000"
+                                  : "",
+                            }}
                           >
                             {/* Team1 */}
                             <div className="t1 team">
@@ -375,7 +381,13 @@ const MatchesSelection = () => {
                         .filter((m) => m.round === round)
                         .map((match) => (
                           // ============================================================= Match
-                          <Paper className={classes.match} variant="outlined">
+                          <Paper
+                            className={classes.match}
+                            variant="outlined"
+                            style={{
+                              border: match === matchWS ? "1px solid #000" : "",
+                            }}
+                          >
                             <div className="info"></div>
                             <div className="t1 team">
                               <div className="name">
