@@ -11,7 +11,6 @@ import {
 } from "@material-ui/core";
 import GamesIcon from "@material-ui/icons/Games";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
-import ScheduleIcon from "@material-ui/icons/Schedule";
 import GroupIcon from "@material-ui/icons/Group";
 import SettingsIcon from "@material-ui/icons/Settings";
 import StorageIcon from "@material-ui/icons/Storage";
@@ -26,9 +25,15 @@ const makeComponentStyles = makeStyles((theme) => ({
   drawer: {
     width: drawerWdith,
     flexShrink: 0,
+    [theme.breakpoints.down("sm")]: {
+      width: 100,
+    },
   },
   drawerPaper: {
     width: drawerWdith,
+    [theme.breakpoints.down("sm")]: {
+      width: 100,
+    },
   },
   nav: {
     padding: theme.spacing(4),
@@ -44,6 +49,9 @@ const makeComponentStyles = makeStyles((theme) => ({
     "& .text": {
       fontSize: 14,
       fontWeight: 300,
+      [theme.breakpoints.down("sm")]: {
+        display: "none",
+      },
     },
   },
   navItemActive: {
