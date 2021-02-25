@@ -8,20 +8,43 @@ import SheetHeadTitle from "../../comps/sheet/SheetHeadTitle";
 import SheetBody from "../../comps/sheet/SheetBody";
 import SheetFooter from "../../comps/sheet/SheetFooter";
 import TextField from "../../comps/textfield/TextField";
-import { Typography, Grid, Button } from "@material-ui/core";
+import { Typography, Grid, Button, makeStyles } from "@material-ui/core";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
 import SheetSection from "../../comps/sheet/SheetSection";
-import { useDocumentData } from "react-firebase-hooks/firestore";
-import { projectFirestore as db } from "../../config/firebase/config";
+// import { useDocumentData } from "react-firebase-hooks/firestore";
+// import { projectFirestore as db } from "../../config/firebase/config";
+
+import Accordion from "@material-ui/core/Accordion";
+import AccordionSummary from "@material-ui/core/AccordionSummary";
+import AccordionDetails from "@material-ui/core/AccordionDetails";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+
 import PowerOutlinedIcon from "@material-ui/icons/PowerOutlined";
 import RadioButton from "../../comps/radiobutton/RadioButton";
 import RadioButtonContainer from "../../comps/radiobutton/RadioButtonContainer";
-import { LowerThirds, ReduxState } from "../../config/types/types";
+import {
+  LowerThirds,
+  LowerThirdsMode,
+  ReduxState,
+} from "../../config/types/types";
+
+const ms = makeStyles((theme) => ({
+  accordionHead: {},
+
+  accordionHeadExpanded: {
+    // minHeight: "auto!important",
+    // margin: 0 + "!important",
+  },
+}));
 
 const ControlLowerThirds = () => {
+  const classes = ms();
   const [form, setForm] = React.useState<LowerThirds>({
     headline: "",
     ticker: "",
+    announcement_headline: "",
+    announcement_content: "",
+    mode: "ticker",
     live: false,
   });
   const ws = React.useContext(wsContext);
@@ -45,82 +68,163 @@ const ControlLowerThirds = () => {
     setForm({ ...form, [e.currentTarget.name]: e.currentTarget.value });
   };
 
-  const toggleLowerThirds = (type: "live" | "live_casters") => () => {
-    ws.setLiveSettings({ lowerThirds: { ...form, [type]: !form[type] } });
+  const toggleLowerThirds = () => {
+    ws.setLiveSettings({ lowerThirds: { ...form, live: !form.live } });
+  };
+
+  const selectMode = (mode: LowerThirdsMode) => () => {
+    ws.setLiveSettings({ lowerThirds: { ...form, mode: mode } });
   };
 
   return (
-    <Sheet>
+    <Sheet style={{ border: "1px solid #8e24aa" }}>
       <SheetHead color="violet">
         <SheetHeadTitle>Lower Thirds</SheetHeadTitle>
         {/* <SheetHeadSub>Subtitle</SheetHeadSub> */}
       </SheetHead>
       <SheetBody>
         {/* Control */}
-        <SheetSection>
-          <Typography variant="h4">Control</Typography>
+        {/* <SheetSectio  */}
+
+        {/* Actions */}
+        <SheetSection style={{ border: "1px solid rgba(0,0,0,.4)" }}>
+          <Typography variant="h4">Mode</Typography>
           <RadioButtonContainer>
             <RadioButton
-              checked={form.live ?? false}
-              label="Lower Thirds"
-              onClick={toggleLowerThirds("live")}
+              checked={form.mode === "ticker"}
+              label="Ticker"
+              onClick={selectMode("ticker")}
             />
             <RadioButton
-              checked={form.live_casters ?? false}
-              label="Casters"
-              onClick={toggleLowerThirds("live_casters")}
+              checked={form.mode === "casters"}
+              label="Caster"
+              onClick={selectMode("casters")}
+            />
+            <RadioButton
+              checked={form.mode === "long"}
+              label="Long Headline"
+              onClick={selectMode("long")}
             />
           </RadioButtonContainer>
         </SheetSection>
 
-        {/* Details */}
-        <SheetSection>
-          <div className="">
-            <Typography variant="h4">Details</Typography>
-          </div>
-          <Grid container spacing={2}>
-            {/* Headline */}
-            <Grid item xs={12}>
-              <TextField
-                onChange={handleChange}
-                label="Headline"
-                name="headline"
-                value={form.headline}
-                fullWidth
-                size="small"
-              />
-            </Grid>
+        {/* Ticker */}
+        <SheetSection style={{ padding: 0 }}>
+          <Accordion style={{ padding: "5px 10px", boxShadow: "none" }}>
+            <AccordionSummary
+              className={classes.accordionHead}
+              classes={{ expanded: classes.accordionHeadExpanded }}
+              expandIcon={<ExpandMoreIcon />}
+            >
+              <Typography variant="h4">Ticker</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                {/* Headline */}
+                <Grid item xs={12}>
+                  <TextField
+                    onChange={handleChange}
+                    label="Headline"
+                    name="headline"
+                    value={form.headline}
+                    fullWidth
+                    size="small"
+                  />
+                </Grid>
 
-            {/* Ticker */}
-            <Grid item xs={12}>
-              <TextField
-                size="small"
-                onChange={handleChange}
-                label="Ticker"
-                name="ticker"
-                multiline
-                value={form.ticker}
-                rows={1}
-                rowsMax={5}
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-          <Button
-            fullWidth
-            variant="contained"
-            style={{ marginTop: 10 }}
-            disabled={
-              form.headline === lowerThirds?.headline &&
-              form.ticker === lowerThirds.ticker
-            }
-            onClick={apply}
-            color="primary"
-          >
-            Apply Changes
-          </Button>
+                {/* Ticker */}
+                <Grid item xs={12}>
+                  <TextField
+                    size="small"
+                    onChange={handleChange}
+                    label="Ticker"
+                    name="ticker"
+                    multiline
+                    value={form.ticker}
+                    rows={1}
+                    rowsMax={5}
+                    fullWidth
+                  />
+                </Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
         </SheetSection>
+
+        {/* Announcements */}
+        <SheetSection style={{ padding: 0 }}>
+          <Accordion style={{ padding: "5px 10px", boxShadow: "none" }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h4">Announcement</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                {/* Headline */}
+                <Grid item xs={12}>
+                  <TextField
+                    onChange={handleChange}
+                    label="Headline"
+                    name="announcement_headline"
+                    value={form.announcement_headline}
+                    fullWidth
+                    size="small"
+                  />
+                </Grid>
+
+                {/* Ticker */}
+                <Grid item xs={12}>
+                  <TextField
+                    size="small"
+                    onChange={handleChange}
+                    label="Content"
+                    name="announcement_content"
+                    multiline
+                    value={form.announcement_content}
+                    rows={1}
+                    rowsMax={5}
+                    fullWidth
+                  />
+                </Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+        </SheetSection>
+
+        {/* Player */}
+        <SheetSection style={{ padding: 0 }}>
+          <Accordion style={{ padding: "5px 10px", boxShadow: "none" }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h4">Featured Player</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                {/* Headline */}
+                <Grid item xs={12}></Grid>
+
+                {/* Ticker */}
+                <Grid item xs={12}></Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+        </SheetSection>
+
+        <Button
+          fullWidth
+          variant="contained"
+          style={{ marginTop: 10 }}
+          disabled={
+            form.headline === lowerThirds?.headline &&
+            form.ticker === lowerThirds?.ticker &&
+            form.announcement_headline === lowerThirds?.announcement_headline &&
+            form.announcement_content === lowerThirds?.announcement_content
+          }
+          onClick={apply}
+          color="primary"
+        >
+          Apply Changes
+        </Button>
       </SheetBody>
+
       <SheetFooter>
         <PowerOutlinedIcon />
         Websocket only. Not Saved Online.
