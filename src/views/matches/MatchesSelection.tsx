@@ -293,7 +293,7 @@ const MatchesSelection = () => {
                   )
                 ).map((round) => (
                   // ========================================================== Round
-                  <Sheet className={classes.round}>
+                  <Sheet className={classes.round} key={round}>
                     <SheetHead
                       color="green"
                       style={{ alignSelf: "flex-start" }}
@@ -309,6 +309,7 @@ const MatchesSelection = () => {
                           <Paper
                             className={classes.match}
                             variant="outlined"
+                            key={match.id}
                             onClick={selectMatch(match)}
                             style={{
                               border:
@@ -371,7 +372,7 @@ const MatchesSelection = () => {
                   )
                 ).map((round) => (
                   // ========================================================== Round
-                  <Sheet className={classes.roundFinalStage}>
+                  <Sheet className={classes.roundFinalStage} key={round}>
                     <SheetHead color="blue" style={{ alignSelf: "flex-start" }}>
                       <SheetHeadTitle>Round {round}</SheetHeadTitle>
                     </SheetHead>
@@ -384,6 +385,7 @@ const MatchesSelection = () => {
                           <Paper
                             className={classes.match}
                             variant="outlined"
+                            key={match.id}
                             style={{
                               border: match === matchWS ? "1px solid #000" : "",
                             }}
