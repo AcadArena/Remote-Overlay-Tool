@@ -97,7 +97,8 @@ const Casters: React.FC = () => {
   const openEditDialog = () => {};
 
   const deleteCaster = (caster: Caster) => {
-    db.collection("live")
+    tournamentRef
+      .collection("live")
       .doc("casters")
       .update({
         list: fbase.firestore.FieldValue.arrayRemove(caster),
