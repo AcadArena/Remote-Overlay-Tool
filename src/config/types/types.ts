@@ -19,11 +19,19 @@ export interface Caster {
 
 export type Tournaments = Tournament[];
 
+export type LowerThirdsMode =
+  | "ticker"
+  | "casters"
+  | "long"
+  | "playerStats"
+  | "playerQuote";
 export interface LowerThirds {
   headline: string;
   ticker: string;
+  announcement_headline: string;
+  announcement_content: string;
   live?: boolean;
-  live_casters?: boolean;
+  mode: LowerThirdsMode;
 }
 
 export interface Tournament {
