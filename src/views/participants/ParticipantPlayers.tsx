@@ -11,7 +11,6 @@ import SheetBody from "../../comps/sheet/SheetBody";
 import SheetHead from "../../comps/sheet/SheetHead";
 import SheetHeadTitle from "../../comps/sheet/SheetHeadTitle";
 import { Participant, Player, Tournament } from "../../config/types/types";
-import { wsContext } from "../../config/websocket/WebsocketProvider";
 import GroupIcon from "@material-ui/icons/Group";
 import SheetSection from "../../comps/sheet/SheetSection";
 import SheetFooter from "../../comps/sheet/SheetFooter";
@@ -76,7 +75,6 @@ const ParticipantPlayers: React.FC<ParticipantPlayersProps> = ({
   ...props
 }) => {
   const classes = makeCompStyles();
-  const ws = React.useContext(wsContext);
   const [loader, setLoader] = React.useState({
     photo_main: false,
     photo_main_upload_progress: 0,

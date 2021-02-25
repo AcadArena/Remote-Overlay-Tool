@@ -1,8 +1,5 @@
-import classes from "*.module.css";
 import { makeStyles } from "@material-ui/core";
-import { ToolbarGroup } from "material-ui";
 import React from "react";
-import Sheet from "./Sheet";
 
 type Color = "blue" | "green" | "red" | "orange" | "violet";
 
