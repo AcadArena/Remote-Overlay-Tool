@@ -46,11 +46,9 @@ const makeCompStyles = makeStyles((theme) => ({
 
 const Tournaments = () => {
   const classes = makeCompStyles();
-  const [selected, setSelected] = React.useState<Tournament | null | undefined>(
-    null
-  );
+  const [selected, setSelected] = React.useState<Tournament | undefined>();
   const { tournament } = useSelector((state: ReduxState) => state.live);
-  const [tournaments, loading] = useCollectionData<Tournament>(
+  const [tournamentsFS, loading] = useCollectionData<Tournament>(
     db.collection("tournaments"),
     { idField: "uid" }
   );
@@ -67,10 +65,10 @@ const Tournaments = () => {
   // }, []);
 
   React.useEffect(() => {
-    setSelected(tournament);
+    if (tournament) setSelected(tournament);
   }, [tournament]);
 
-  const selectTournament = (t: any) => () => {
+  const selectTournament = (t: Tournament) => () => {
     ws.setLiveSettings({ tournament: t });
   };
 
@@ -117,12 +115,12 @@ const Tournaments = () => {
                 <Typography variant="h4">Select Tournament</Typography>
                 <div className={classes.tournamentsContainer}>
                   {!loading &&
-                    (tournaments?.length ? (
+                    (tournamentsFS?.length ? (
                       <RadioButtonContainer>
-                        {tournaments.map((t) => (
+                        {tournamentsFS.map((t) => (
                           <RadioButton
-                            key={tournament?.id}
-                            checked={t.url === selected?.url}
+                            key={t.id}
+                            checked={t.id === selected?.id}
                             label={t.url}
                             onClick={selectTournament(t)}
                           >
