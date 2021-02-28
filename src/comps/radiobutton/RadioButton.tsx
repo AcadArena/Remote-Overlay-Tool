@@ -13,6 +13,7 @@ interface RadioButtonProps {
   style?: any;
   onClick?: (e: MouseEvent) => any;
   [key: string]: any;
+  disabled?: boolean;
 }
 
 const makeCompStyles = makeStyles((theme) => ({
@@ -36,6 +37,8 @@ const RadioButton: React.FC<RadioButtonProps> = ({
   checked,
   fullWidth,
   onClick,
+  children,
+  disabled,
   ...props
 }) => {
   const classes = makeCompStyles({ fullWidth });
@@ -45,7 +48,7 @@ const RadioButton: React.FC<RadioButtonProps> = ({
       className={clsx(classes.radioButton, props.className)}
       style={{ ...props.style }}
     >
-      <IconButton size="medium" onClick={onClick}>
+      <IconButton size="medium" onClick={onClick} disabled={disabled}>
         {checked ? (
           <RadioButtonCheckedIcon className={classes.icon} />
         ) : (
@@ -55,6 +58,7 @@ const RadioButton: React.FC<RadioButtonProps> = ({
       <Typography align="center" className={classes.label}>
         {label}
       </Typography>
+      {children}
     </Paper>
   );
 };

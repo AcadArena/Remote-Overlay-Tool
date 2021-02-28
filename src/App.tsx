@@ -1,11 +1,20 @@
-import { makeStyles } from "@material-ui/core";
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Redirect, Route, Switch } from "react-router-dom";
+
+import { useSelector } from "react-redux";
+
+import { makeStyles } from "@material-ui/core";
 import Button from "./comps/layout/Button";
 import InnerNav from "./comps/layout/InnerNav";
 import Nav from "./comps/layout/Nav";
 import Control from "./views/control/Control";
-import TextFieldsPage from "./views/textfields/TextFieldsPage";
+import Settings from "./views/settings/Settings";
+import { ReduxState } from "./config/types/types";
+import Tournaments from "./views/tournaments/Tournaments";
+import ParticipantsPage from "./views/participants/ParticipantsPage";
+import MatchesPage from "./views/matches/MatchesPage";
+import WebsocketDialog from "./comps/connection/WebsocketDialog";
+import { wsContext } from "./config/websocket/WebsocketProvider";
 
 const makeComponentStyles = makeStyles((theme) => ({
   app: {
@@ -29,24 +38,52 @@ const makeComponentStyles = makeStyles((theme) => ({
 
 function App() {
   const classes = makeComponentStyles();
+  const ws = React.useContext(wsContext);
+  const { tournament, websocket_users } = useSelector(
+    (state: ReduxState) => state.live
+  );
+
   return (
     <div className={classes.app}>
       <Nav />
       <div className={classes.mainPanel}>
-        <InnerNav />
-        <div className="content">
-          <Switch>
-            <Route exact path="/dashboard"></Route>
-            <Route exact path="/schedule"></Route>
-            <Route exact path="/bracket"></Route>
-            <Route exact path="/textfields">
-              <TextFieldsPage />
-            </Route>
-            <Route exact path="/control">
-              <Control />
-            </Route>
-          </Switch>
-        </div>
+        {tournament ? (
+          <>
+            <InnerNav />
+            <div className="content">
+              <Switch>
+                <Route exact path="/tournaments">
+                  <Tournaments />
+                </Route>
+                <Route exact path="/participants">
+                  <ParticipantsPage />
+                </Route>
+                <Route exact path="/matches">
+                  <MatchesPage />
+                </Route>
+                <Route exact path="/schedule"></Route>
+                <Route exact path="/settings">
+                  <Settings />
+                </Route>
+                <Route exact path="/control">
+                  <Control />
+                </Route>
+              </Switch>
+            </div>
+          </>
+        ) : (
+          <>
+            <Redirect to="/tournaments" />
+            <Tournaments />
+          </>
+        )}
+
+        <WebsocketDialog
+          open={
+            websocket_users.findIndex((user) => user.id === ws.socket?.id) ===
+            -1
+          }
+        />
       </div>
     </div>
   );

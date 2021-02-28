@@ -1,8 +1,5 @@
-import classes from "*.module.css";
 import { makeStyles } from "@material-ui/core";
-import { ToolbarGroup } from "material-ui";
 import React from "react";
-import Sheet from "./Sheet";
 
 type Color = "blue" | "green" | "red" | "orange" | "violet";
 
@@ -11,6 +8,8 @@ interface SheetHead {
   icon?: React.ReactElement;
   color?: Color;
   align?: "right" | "left";
+  className?: string;
+  [key: string]: any;
 }
 
 const getBackgroundColor = ({ color }: SheetHead): string => {
@@ -99,12 +98,13 @@ const SheetHead: React.FC<SheetHead> = ({
   children,
   color,
   align,
+  className,
   ...props
 }) => {
   const classes = makeComponentStyles({ color, align, icon });
 
   return (
-    <div className={classes.sheetHead}>
+    <div className={classes.sheetHead + " " + className} {...props}>
       {icon && <div className={classes.icon}>{icon}</div>}
       <div className={classes.sheetHeadContent}>{children}</div>
     </div>

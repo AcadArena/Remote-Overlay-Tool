@@ -1,5 +1,6 @@
 import { makeStyles, Paper } from "@material-ui/core";
 import React from "react";
+import clsx from "clsx";
 
 const makeComponentStyles = makeStyles((theme) => ({
   SheetSection: {
@@ -10,10 +11,14 @@ const makeComponentStyles = makeStyles((theme) => ({
   },
 }));
 
-const SheetSection: React.FC = ({ children, ...props }) => {
+const SheetSection: React.FC<any & React.HTMLAttributes<HTMLDivElement>> = ({
+  children,
+  className,
+  ...props
+}) => {
   const classes = makeComponentStyles();
   return (
-    <Paper className={classes.SheetSection} {...props}>
+    <Paper className={classes.SheetSection + " " + className} {...props}>
       {children}
     </Paper>
   );
