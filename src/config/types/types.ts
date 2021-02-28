@@ -1,14 +1,23 @@
 export interface ReduxState {
   live: Live;
 }
+
+export interface WebsocketUser {
+  id: string;
+  room: string;
+  username: string;
+}
 export interface Live {
   lowerThirds?: LowerThirds;
   tournament?: Tournament;
   casters?: Caster[];
   match?: Match;
+  match_live?: boolean;
   matches_previous?: Match[];
   matches_today?: Match[];
   matches_next?: Match[];
+  websocket_users: WebsocketUser[];
+  room: string;
 }
 
 export interface Caster {
@@ -32,6 +41,22 @@ export interface LowerThirds {
   announcement_content: string;
   live?: boolean;
   mode: LowerThirdsMode;
+  player?: Player;
+  player_quote?: string;
+  player_stats?: {
+    left?: {
+      property?: string;
+      value?: string;
+    };
+    middle?: {
+      property?: string;
+      value?: string;
+    };
+    right?: {
+      property?: string;
+      value?: string;
+    };
+  };
 }
 
 export interface Tournament {
@@ -54,6 +79,7 @@ export interface Tournament {
   participants_count: number;
   participants: Participant[];
   matches: Match[];
+  game_name: string;
 }
 
 export interface ParticipantElement {
@@ -88,6 +114,8 @@ export interface Player {
   photo_main?: string;
   photo_sub?: string;
   photo_profile_shot?: string;
+  role?: "";
+  team?: Participant;
 }
 
 export interface MatchElement {
