@@ -1,5 +1,5 @@
 import { Button, makeStyles, Paper, Typography } from "@material-ui/core";
-import React from "react";
+import React, { MouseEvent } from "react";
 import Sheet from "../../comps/sheet/Sheet";
 import SheetBody from "../../comps/sheet/SheetBody";
 import SheetHead from "../../comps/sheet/SheetHead";
@@ -18,6 +18,22 @@ import { wsContext } from "../../config/websocket/WebsocketProvider";
 import SaveIcon from "@material-ui/icons/Save";
 import CheckIcon from "@material-ui/icons/Check";
 
+export const getFinalScore = (score: string) => {
+  const scores: string[] = score.split(",");
+  let team1: number = 0;
+  let team2: number = 0;
+
+  scores.forEach((s) => {
+    let ss = s.match(/^(\d*)-(\d*)/);
+    if (ss && parseInt(ss[1]) > parseInt(ss[2])) {
+      team1 = team1 + 1;
+    } else if (ss && parseInt(ss[1]) < parseInt(ss[2])) {
+      team2 = team2 + 1;
+    }
+  });
+  return `${team1} - ${team2}`;
+};
+
 const makeCompStyles = makeStyles((theme) => ({
   matches: {
     display: "grid",
@@ -30,6 +46,7 @@ const makeCompStyles = makeStyles((theme) => ({
     alignItems: "center",
     cursor: "pointer",
     transition: "100ms ease-out",
+    position: "relative",
 
     "&:hover": {
       border: "1px solid rgba(0,0,0,.75)",
@@ -96,13 +113,32 @@ const makeCompStyles = makeStyles((theme) => ({
       marginRight: theme.spacing(2),
     },
   },
+
+  schedule: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  badge: {
+    position: "absolute",
+    top: -15,
+    right: -15,
+    height: 30,
+    width: 30,
+    borderRadius: "50%",
+    display: "flex",
+    backgroundColor: theme.palette.primary.main,
+    color: "#f9f9f9",
+    alignItems: "center",
+    justifyContent: "center",
+    fontWeight: "bold",
+  },
 }));
 
 const MatchesSelection = () => {
   const classes = makeCompStyles();
   const [matches, setMatches] = React.useState<Match[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const { tournament, match: matchWS } = useSelector(
+  const { tournament, match: matchWS, matches_today = [] } = useSelector(
     (state: ReduxState) => state.live
   );
   const [selected, setSelected] = React.useState<Match | undefined>();
@@ -161,7 +197,8 @@ const MatchesSelection = () => {
       tournament?.participants.find((p) => p.group_player_ids.includes(id))
         ?.org_name ??
       tournament?.participants.find((p) => p.group_player_ids.includes(id))
-        ?.display_name
+        ?.display_name ??
+      "TBD"
     );
   };
   const getTeamLogo = (id: number) => {
@@ -172,24 +209,22 @@ const MatchesSelection = () => {
     );
   };
 
-  const getFinalScore = (score: string) => {
-    const scores: string[] = score.split(",");
-    let team1: number = 0;
-    let team2: number = 0;
-
-    scores.forEach((s) => {
-      let ss = s.match(/^(\d*)-(\d*)/);
-      if (ss && ss[1] > ss[2]) {
-        team1 = team1 + 1;
-      } else if (ss && ss[1] < ss[2]) {
-        team2 = team2 + 1;
+  const selectMatch = (m: Match) => (e: MouseEvent) => {
+    if (e.ctrlKey) {
+      if (!matches_today.some((mm) => mm.id === m.id)) {
+        ws.setLiveSettings({ matches_today: [...matches_today, m] });
+      } else {
+        ws.setLiveSettings({
+          matches_today: matches_today.filter((mm) => mm.id !== m.id),
+        });
       }
-    });
-    return `${team1} - ${team2}`;
+    } else {
+      ws.setLiveSettings({ match: m });
+    }
   };
 
-  const selectMatch = (m: Match) => () => {
-    ws.setLiveSettings({ match: m });
+  const findScheduleIndex = (m: Match): number => {
+    return matches_today.findIndex((mm) => mm.id === m.id);
   };
 
   return (
@@ -277,6 +312,72 @@ const MatchesSelection = () => {
             </div>
           </SheetSection>
         )}
+
+        {/* SCHEDULE */}
+        <SheetSection>
+          <Typography variant="h4">Schedule</Typography>
+          <div className={classes.schedule}>
+            {matches_today.length
+              ? matches_today.map((match) => (
+                  <Paper
+                    className={classes.match}
+                    variant="outlined"
+                    onClick={() =>
+                      ws.setLiveSettings({
+                        matches_today: matches_today.filter(
+                          (mm) => mm.id !== match.id
+                        ),
+                      })
+                    }
+                  >
+                    {/* Team1 */}
+                    <div className="t1 team">
+                      <div className="name">
+                        {getTeamName(match.player1_id ?? 0)}
+                      </div>
+                      <div
+                        className="logo"
+                        style={{
+                          backgroundImage: `url(${getTeamLogo(
+                            match.player1_id ?? 0
+                          )})`,
+                          border: Boolean(getTeamLogo(match.player1_id ?? 0))
+                            ? "none"
+                            : "",
+                        }}
+                      ></div>
+                    </div>
+
+                    {/* VS */}
+                    <div className="vs">
+                      <Typography className="text">VS</Typography>
+                      <Typography variant="caption" className="score">
+                        {getFinalScore(match.scores_csv ?? "")}
+                      </Typography>
+                    </div>
+
+                    {/* Team 2 */}
+                    <div className="t2 team">
+                      <div
+                        className="logo"
+                        style={{
+                          backgroundImage: `url(${getTeamLogo(
+                            match.player2_id ?? 0
+                          )})`,
+                          border: Boolean(getTeamLogo(match.player2_id ?? 0))
+                            ? "none"
+                            : "",
+                        }}
+                      ></div>
+                      <div className="name">
+                        {getTeamName(match.player2_id ?? 0)}
+                      </div>
+                    </div>
+                  </Paper>
+                ))
+              : "No Matches Scheduled"}
+          </div>
+        </SheetSection>
         {Boolean(matches.length) && (
           <>
             {/* ========================================================================== GROUP STAGE */}
@@ -346,11 +447,27 @@ const MatchesSelection = () => {
 
                             {/* Team 2 */}
                             <div className="t2 team">
-                              <div className="logo"></div>
+                              <div
+                                className="logo"
+                                style={{
+                                  backgroundImage: `url(${getTeamLogo(
+                                    match.player2_id
+                                  )})`,
+                                  border: Boolean(getTeamLogo(match.player2_id))
+                                    ? "none"
+                                    : "",
+                                }}
+                              ></div>
                               <div className="name">
                                 {getTeamName(match.player2_id)}
                               </div>
                             </div>
+
+                            {findScheduleIndex(match) !== -1 && (
+                              <div className={classes.badge}>
+                                {findScheduleIndex(match) + 1}
+                              </div>
+                            )}
                           </Paper>
                         ))}
                     </SheetBody>
@@ -386,8 +503,12 @@ const MatchesSelection = () => {
                             className={classes.match}
                             variant="outlined"
                             key={match.id}
+                            onClick={selectMatch(match)}
                             style={{
-                              border: match === matchWS ? "1px solid #000" : "",
+                              border:
+                                match.id === matchWS?.id
+                                  ? "1px solid #000"
+                                  : "",
                             }}
                           >
                             <div className="info"></div>
@@ -429,6 +550,11 @@ const MatchesSelection = () => {
                                 {getTeamName(match.player2_id)}
                               </div>
                             </div>
+                            {findScheduleIndex(match) !== -1 && (
+                              <div className={classes.badge}>
+                                {findScheduleIndex(match) + 1}
+                              </div>
+                            )}
                           </Paper>
                         ))}
                     </SheetBody>
