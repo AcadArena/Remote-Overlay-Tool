@@ -21,6 +21,10 @@ import { projectFirestore as db } from "../../config/firebase/config";
 import { Caster, ReduxState } from "../../config/types/types";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
 
+interface CasterSelectionProps extends RouteComponentProps {
+  alt?: boolean;
+}
+
 const makeCompStyles = makeStyles((theme) => ({
   casters: {
     display: "grid",
@@ -60,9 +64,9 @@ const makeCompStyles = makeStyles((theme) => ({
   },
 }));
 
-const CasterSelection: React.FC<RouteComponentProps> = ({ history }) => {
+const CasterSelection: React.FC<CasterSelectionProps> = ({ history, alt }) => {
   const classes = makeCompStyles();
-  const { tournament, casters: castersWS } = useSelector(
+  const { tournament, casters: castersWS, casters_alt } = useSelector(
     (state: ReduxState) => state.live
   );
   const ws = React.useContext(wsContext);
@@ -76,9 +80,13 @@ const CasterSelection: React.FC<RouteComponentProps> = ({ history }) => {
   );
 
   React.useEffect(() => {
-    if (!castersWS) return;
-    setSelection(castersWS);
-  }, [castersWS, setSelection]);
+    if (!castersWS && !casters_alt) return;
+    if (alt) {
+      setSelection(casters_alt ?? []);
+    } else {
+      setSelection(castersWS ?? []);
+    }
+  }, [casters_alt, castersWS, setSelection]);
 
   const handleClick = (caster: Caster) => () => {
     if (selection.some((c) => c.ign === caster.ign)) {
@@ -99,13 +107,17 @@ const CasterSelection: React.FC<RouteComponentProps> = ({ history }) => {
   };
 
   const apply = () => {
-    ws.setLiveSettings({ casters: selection });
+    if (!alt) {
+      ws.setLiveSettings({ casters: selection });
+    } else {
+      ws.setLiveSettings({ casters_alt: selection });
+    }
   };
 
   return (
     <Sheet loading={loading}>
-      <SheetHead color="green">
-        <SheetHeadTitle>Caster Pool</SheetHeadTitle>
+      <SheetHead color={alt ? "blue" : "red"}>
+        <SheetHeadTitle>Caster Pool {alt && "Alternate"}</SheetHeadTitle>
       </SheetHead>
       <SheetBody className={classes.body}>
         <div className={classes.casters}>
@@ -159,7 +171,7 @@ const CasterSelection: React.FC<RouteComponentProps> = ({ history }) => {
           style={{ alignSelf: "center", marginTop: selection?.length ? 0 : 20 }}
           variant="outlined"
           color="primary"
-          disabled={castersWS === selection}
+          disabled={alt ? casters_alt === selection : castersWS === selection}
           onClick={apply}
         >
           Apply
