@@ -11,6 +11,7 @@ export interface Live {
   lowerThirds?: LowerThirds;
   tournament?: Tournament;
   casters?: Caster[];
+  casters_alt?: Caster[];
   match?: Match;
   match_live?: boolean;
   matches_previous?: Match[];
