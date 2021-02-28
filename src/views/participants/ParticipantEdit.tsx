@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Participant, Tournament } from "../../config/types/types";
+import { Participant, ReduxState, Tournament } from "../../config/types/types";
 
 import {
   makeStyles,
@@ -32,6 +32,7 @@ import GroupIcon from "@material-ui/icons/Group";
 import SheetFooter from "../../comps/sheet/SheetFooter";
 import swal from "sweetalert";
 import WarningIcon from "@material-ui/icons/Warning";
+import { useSelector } from "react-redux";
 
 const fileTypes = [
   "image/png",
@@ -204,7 +205,6 @@ const EditDialog: React.FC<EditDialogProps> = ({
     currentTarget: { value, name },
   }: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [name]: value });
-    console.log(form?.org_name);
   };
 
   const save = () => {
@@ -220,7 +220,14 @@ const EditDialog: React.FC<EditDialogProps> = ({
       })
       .then(() => {
         setSuccess(true);
-        ws.setLiveSettings({ tournament: tournament });
+        ws.setLiveSettings({
+          tournament: {
+            ...tournament,
+            participants: tournament?.participants.map((p) =>
+              p.id === form?.id ? form : p
+            ),
+          },
+        });
         clearAll();
       })
       .catch((err) => {});

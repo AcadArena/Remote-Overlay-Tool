@@ -69,7 +69,9 @@ const Tournaments = () => {
   }, [tournament]);
 
   const selectTournament = (t: Tournament) => () => {
-    ws.setLiveSettings({ tournament: t });
+    ws.setLiveSettings({
+      tournament: t,
+    });
   };
 
   const deleteTournament = (t: Tournament) => () => {
@@ -226,6 +228,7 @@ const AddTournament: React.FC<AddTournament> = ({ open, onClose }) => {
     matches: [],
     subdomain: null,
     participants_count: 0,
+    game_name: "",
   });
 
   const [saveLoading, setSaveLoading] = React.useState<boolean>(false);
@@ -275,6 +278,7 @@ const AddTournament: React.FC<AddTournament> = ({ open, onClose }) => {
           matches: [],
           subdomain: tournament.subdomain,
           url: tournament.url,
+          game_name: tournament.game_name,
         });
       })
       .catch((err) => {
@@ -305,6 +309,7 @@ const AddTournament: React.FC<AddTournament> = ({ open, onClose }) => {
       matches: [],
       participants_count: 0,
       subdomain: null,
+      game_name: "",
     });
     setLoading(false);
     setSaveLoading(false);

@@ -92,6 +92,7 @@ const ParticipantPlayers: React.FC<ParticipantPlayersProps> = ({
               photo_main: "",
               photo_sub: "",
               photo_profile_shot: "",
+              role: "",
             },
           ]
         : [
@@ -101,6 +102,7 @@ const ParticipantPlayers: React.FC<ParticipantPlayersProps> = ({
               photo_main: "",
               photo_sub: "",
               photo_profile_shot: "",
+              role: "",
             },
           ],
     });
@@ -219,7 +221,7 @@ const ParticipantPlayers: React.FC<ParticipantPlayersProps> = ({
           <div className={classes.sheetContainer}>
             {Boolean(participant?.players?.length) ? (
               participant?.players?.map((player: Player, i: number) => (
-                <SheetSection className={classes.player} key={player.ign}>
+                <SheetSection className={classes.player} key={i}>
                   <Button
                     component="label"
                     className="photo"
@@ -250,6 +252,16 @@ const ParticipantPlayers: React.FC<ParticipantPlayersProps> = ({
                       value={player.ign}
                       name="ign"
                       label="IGN"
+                      size="small"
+                      style={{ marginBottom: 15 }}
+                      onChange={handleChange(player, i)}
+                    />
+                    <TextField
+                      variant="outlined"
+                      className="field"
+                      value={player.role}
+                      name="role"
+                      label="Role"
                       size="small"
                       onChange={handleChange(player, i)}
                     />
