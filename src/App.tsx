@@ -13,6 +13,8 @@ import { ReduxState } from "./config/types/types";
 import Tournaments from "./views/tournaments/Tournaments";
 import ParticipantsPage from "./views/participants/ParticipantsPage";
 import MatchesPage from "./views/matches/MatchesPage";
+import WebsocketDialog from "./comps/connection/WebsocketDialog";
+import { wsContext } from "./config/websocket/WebsocketProvider";
 
 const makeComponentStyles = makeStyles((theme) => ({
   app: {
@@ -36,8 +38,10 @@ const makeComponentStyles = makeStyles((theme) => ({
 
 function App() {
   const classes = makeComponentStyles();
-
-  const { tournament } = useSelector((state: ReduxState) => state.live);
+  const ws = React.useContext(wsContext);
+  const { tournament, websocket_users } = useSelector(
+    (state: ReduxState) => state.live
+  );
 
   return (
     <div className={classes.app}>
@@ -73,6 +77,13 @@ function App() {
             <Tournaments />
           </>
         )}
+
+        <WebsocketDialog
+          open={
+            websocket_users.findIndex((user) => user.id === ws.socket?.id) ===
+            -1
+          }
+        />
       </div>
     </div>
   );
