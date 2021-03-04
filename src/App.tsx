@@ -7,14 +7,16 @@ import { makeStyles } from "@material-ui/core";
 import Button from "./comps/layout/Button";
 import InnerNav from "./comps/layout/InnerNav";
 import Nav from "./comps/layout/Nav";
-import Control from "./views/control/Control";
-import Settings from "./views/settings/Settings";
+import Control from "./views/lowerthirds/Control";
+import Settings from "./views/casters/CastersPage";
 import { ReduxState } from "./config/types/types";
 import Tournaments from "./views/tournaments/Tournaments";
 import ParticipantsPage from "./views/participants/ParticipantsPage";
 import MatchesPage from "./views/matches/MatchesPage";
+import StatsPage from "./views/stats/StatsPage";
 import WebsocketDialog from "./comps/connection/WebsocketDialog";
 import { wsContext } from "./config/websocket/WebsocketProvider";
+import TimerPage from "./views/timer/TimerPage";
 
 const makeComponentStyles = makeStyles((theme) => ({
   app: {
@@ -62,11 +64,17 @@ function App() {
                   <MatchesPage />
                 </Route>
                 <Route exact path="/schedule"></Route>
-                <Route exact path="/settings">
+                <Route exact path="/casters">
                   <Settings />
                 </Route>
-                <Route exact path="/control">
+                <Route exact path="/lowerthirds">
                   <Control />
+                </Route>
+                <Route exact path="/timer">
+                  <TimerPage />
+                </Route>
+                <Route exact path="/stats">
+                  <StatsPage />
                 </Route>
               </Switch>
             </div>

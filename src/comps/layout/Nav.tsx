@@ -15,8 +15,11 @@ import {
 import GamesIcon from "@material-ui/icons/Games";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
 import GroupIcon from "@material-ui/icons/Group";
-import SettingsIcon from "@material-ui/icons/Settings";
 import StorageIcon from "@material-ui/icons/Storage";
+import HeadsetMicIcon from "@material-ui/icons/HeadsetMic";
+import AccessTimeIcon from "@material-ui/icons/AccessTime";
+import BarChartIcon from "@material-ui/icons/BarChart";
+import CallToActionIcon from "@material-ui/icons/CallToAction";
 import { ReactComponent as BattleIcon } from "../assets/battle.svg";
 
 import { withRouter, RouteComponentProps } from "react-router-dom";
@@ -93,19 +96,22 @@ const navData = [
   {
     title: "Matches",
     url: "/matches",
-    icon: (
-      <SvgIcon>
-        <BattleIcon />
-      </SvgIcon>
-    ),
-  },
-  {
-    title: "Bracket",
-    url: "/bracket",
+    // icon: (
+    //   <SvgIcon>
+    //     <BattleIcon />
+    //   </SvgIcon>
+    // ),
     icon: <AccountTreeIcon style={{ transform: "scaleX(-1)" }} />,
   },
-  { title: "Settings", url: "/settings", icon: <SettingsIcon /> },
-  { title: "Control", url: "/control", icon: <GamesIcon /> },
+  // {
+  //   title: "Bracket",
+  //   url: "/bracket",
+  //   icon: <AccountTreeIcon style={{ transform: "scaleX(-1)" }} />,
+  // },
+  { title: "Casters", url: "/casters", icon: <HeadsetMicIcon /> },
+  { title: "Lower Thirds", url: "/lowerthirds", icon: <CallToActionIcon /> },
+  { title: "Timer", url: "/timer", icon: <AccessTimeIcon /> },
+  { title: "Stats", url: "/stats", icon: <BarChartIcon /> },
 ];
 
 const Nav: React.FC<RouteComponentProps> = ({

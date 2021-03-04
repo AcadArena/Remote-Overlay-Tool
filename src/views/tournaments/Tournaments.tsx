@@ -8,7 +8,12 @@ import SheetHead from "../../comps/sheet/SheetHead";
 import SheetHeadTitle from "../../comps/sheet/SheetHeadTitle";
 import SheetSection from "../../comps/sheet/SheetSection";
 import { projectFirestore as db } from "../../config/firebase/config";
-import { Participant, ReduxState, Tournament } from "../../config/types/types";
+import {
+  Match,
+  Participant,
+  ReduxState,
+  Tournament,
+} from "../../config/types/types";
 import axios from "axios";
 import swal from "sweetalert";
 
@@ -31,6 +36,7 @@ import RadioButton from "../../comps/radiobutton/RadioButton";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
 import SheetFooter from "../../comps/sheet/SheetFooter";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import RefreshIcon from "@material-ui/icons/Refresh";
 
 const makeCompStyles = makeStyles((theme) => ({
   tournamentsContainer: {},
@@ -54,6 +60,7 @@ const Tournaments = () => {
   );
   const ws = React.useContext(wsContext);
   const [addDialogState, setAddDialogState] = React.useState<boolean>(false);
+  const [loading2, setLoading] = React.useState<boolean>(false);
 
   // React.useEffect(() => {
   //   if (tournament) {
@@ -99,6 +106,94 @@ const Tournaments = () => {
     });
   };
 
+  const refresh = (t: Tournament) => () => {
+    const apiKey = "J4V1S6QqJQS6FFcHUKoq6zI3P1r0sddPxB7zcCbC";
+    const username = "manoku";
+    setLoading(true);
+    axios
+      .get(
+        `https://api.challonge.com/v1/tournaments/${t.uid}.json?api_key=${apiKey}&include_participants=1&include_matches=1`
+      )
+      .then(({ data: { tournament } }) => {
+        setLoading(false);
+        ws.setLiveSettings({
+          tournament: {
+            id: tournament.id,
+            name: tournament.name,
+            tournament_type: tournament.tournament_type,
+            started_at: tournament.started_at,
+            completed_at: tournament.completed_at,
+            created_at: tournament.created_at,
+            updated_at: tournament.updated_at,
+            state: tournament.state,
+            ranked_by: tournament.ranked_by,
+            group_stages_enabled: tournament.group_stages_enabled,
+            teams: tournament.teams,
+            participants_count: tournament.participants_count,
+            participants: tournament.participants.map(
+              ({ participant }: any): Participant => ({
+                id: participant.id,
+                tournament_id: participant.tournament_id,
+                name: participant.name,
+                seed: participant.seed,
+                active: participant.active,
+                created_at: participant.created_at,
+                updated_at: participant.updated_at,
+                final_rank: participant.final_rank,
+                on_waiting_list: participant.on_waiting_list,
+                display_name_with_invitation_email_address:
+                  participant.display_name_with_invitation_email_address,
+                display_name: participant.display_name,
+                group_player_ids: participant.group_player_ids,
+              })
+            ),
+            matches: tournament.matches.map(({ match }: Match): Match => match),
+            subdomain: tournament.subdomain,
+            url: tournament.url,
+            game_name: tournament.game_name,
+          },
+        });
+
+        db.collection("tournaments")
+          .doc(t.uid)
+          .set({
+            id: tournament.id,
+            name: tournament.name,
+            tournament_type: tournament.tournament_type,
+            started_at: tournament.started_at,
+            completed_at: tournament.completed_at,
+            created_at: tournament.created_at,
+            updated_at: tournament.updated_at,
+            state: tournament.state,
+            ranked_by: tournament.ranked_by,
+            group_stages_enabled: tournament.group_stages_enabled,
+            teams: tournament.teams,
+            participants_count: tournament.participants_count,
+            participants: tournament.participants.map(
+              ({ participant }: any): Participant => ({
+                id: participant.id,
+                tournament_id: participant.tournament_id,
+                name: participant.name,
+                seed: participant.seed,
+                active: participant.active,
+                created_at: participant.created_at,
+                updated_at: participant.updated_at,
+                final_rank: participant.final_rank,
+                on_waiting_list: participant.on_waiting_list,
+                display_name_with_invitation_email_address:
+                  participant.display_name_with_invitation_email_address,
+                display_name: participant.display_name,
+                group_player_ids: participant.group_player_ids,
+              })
+            ),
+            matches: tournament.matches.map(({ match }: Match): Match => match),
+            subdomain: tournament.subdomain,
+            url: tournament.url,
+            game_name: tournament.game_name,
+          });
+      });
+  };
+
   return (
     <div style={{ height: "100%" }}>
       <Grid
@@ -108,7 +203,7 @@ const Tournaments = () => {
         style={{ height: "100%" }}
       >
         <Grid item md={10} xs={12} lg={8}>
-          <Sheet loading={loading}>
+          <Sheet loading={loading || loading2}>
             <SheetHead>
               <SheetHeadTitle>Tournaments</SheetHeadTitle>
             </SheetHead>
@@ -129,6 +224,9 @@ const Tournaments = () => {
                             <div>Participants: {t.participants.length}</div>
                             <IconButton onClick={deleteTournament(t)}>
                               <DeleteForeverIcon />
+                            </IconButton>
+                            <IconButton onClick={refresh(t)}>
+                              <RefreshIcon />
                             </IconButton>
                           </RadioButton>
                         ))}

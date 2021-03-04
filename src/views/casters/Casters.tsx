@@ -108,7 +108,7 @@ const Casters: React.FC = () => {
   return (
     <Sheet loading={loading}>
       <SheetHead color="green">
-        <SheetHeadTitle>Casters</SheetHeadTitle>
+        <SheetHeadTitle>Casters Pool</SheetHeadTitle>
       </SheetHead>
       <SheetBody>
         <div className={classes.casters}>

@@ -117,7 +117,9 @@ const CasterSelection: React.FC<CasterSelectionProps> = ({ history, alt }) => {
   return (
     <Sheet loading={loading}>
       <SheetHead color={alt ? "blue" : "red"}>
-        <SheetHeadTitle>Caster Pool {alt && "Alternate"}</SheetHeadTitle>
+        <SheetHeadTitle>
+          Broadcast Casters {alt ? "Alternate" : "Main"}
+        </SheetHeadTitle>
       </SheetHead>
       <SheetBody className={classes.body}>
         <div className={classes.casters}>
@@ -178,13 +180,7 @@ const CasterSelection: React.FC<CasterSelectionProps> = ({ history, alt }) => {
         </Button>
       </SheetBody>
       <SheetFooter>
-        To add / edit / delete casters go to
-        <a
-          onClick={() => history.push("/settings")}
-          style={{ color: "skyblue", cursor: "pointer" }}
-        >
-          &nbsp;settings
-        </a>
+        add ?alt=1 to url to activate the alternate casters
       </SheetFooter>
     </Sheet>
   );

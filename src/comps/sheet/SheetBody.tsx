@@ -4,6 +4,7 @@ import React from "react";
 const makeComponentStyles = makeStyles((theme) => ({
   sheetBody: {
     margin: theme.spacing(3),
+    flex: 1,
   },
 }));
 

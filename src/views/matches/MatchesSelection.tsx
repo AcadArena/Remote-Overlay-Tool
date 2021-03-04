@@ -261,7 +261,11 @@ const MatchesSelection = () => {
 
         {/* SelectedMatch */}
         {matchWS && (
-          <SheetSection>
+          <SheetSection
+            style={{
+              border: "1px solid rgba(0, 172, 193, 1)",
+            }}
+          >
             <Typography variant="h4">Selected Match</Typography>
             <div className="">
               <Paper className={classes.match} variant="outlined">
@@ -314,12 +318,13 @@ const MatchesSelection = () => {
         )}
 
         {/* SCHEDULE */}
-        <SheetSection>
+        <SheetSection style={{ border: "1px solid rgba(255, 152, 0, 1)" }}>
           <Typography variant="h4">Schedule</Typography>
           <div className={classes.schedule}>
             {matches_today.length
               ? matches_today.map((match) => (
                   <Paper
+                    key={match.id}
                     className={classes.match}
                     variant="outlined"
                     onClick={() =>
@@ -381,7 +386,7 @@ const MatchesSelection = () => {
         {Boolean(matches.length) && (
           <>
             {/* ========================================================================== GROUP STAGE */}
-            <Sheet className={classes.groupstage}>
+            <Sheet style={{ height: "auto" }} className={classes.groupstage}>
               <SheetHead color="green" style={{ alignSelf: "flex-start" }}>
                 <SheetHeadTitle>Group Stage</SheetHeadTitle>
               </SheetHead>
@@ -476,7 +481,7 @@ const MatchesSelection = () => {
               </SheetBody>
             </Sheet>
             {/* ========================================================================== FINAL STAGE */}
-            <Sheet className={classes.finalStage}>
+            <Sheet style={{ height: "auto" }} className={classes.finalStage}>
               <SheetHead color="blue" style={{ alignSelf: "flex-start" }}>
                 <SheetHeadTitle>Final Stage / Playoffs</SheetHeadTitle>
               </SheetHead>

@@ -10,11 +10,13 @@ interface RouteMap {
 }
 
 const routeMap: RouteMap = {
-  bracket: "Bracket",
+  matches: "Match List",
   participants: "Participants",
-  control: "Control Panel",
+  lowerthirds: "Lower Thirds",
   schedule: "Stream Schedule",
-  settings: "Settings",
+  casters: "Casters",
+  timer: "Timer",
+  stats: "Stats",
   tournaments: "Tournaments",
 };
 

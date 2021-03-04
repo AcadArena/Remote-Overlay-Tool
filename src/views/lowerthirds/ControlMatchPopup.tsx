@@ -55,11 +55,11 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
   );
   const ws = React.useContext(wsContext);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [scores, setScores] = React.useState<string>("");
+  const [scores, setScores] = React.useState<string>("0-0");
 
   React.useEffect(() => {
     if (!match) return;
-    setScores(match?.scores_csv ?? "");
+    setScores(match?.scores_csv || "0-0");
   }, [match, setScores]);
 
   const selectMatch = () => {
@@ -84,7 +84,7 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
             ...tournament,
             matches: tournament?.matches?.map((m) =>
               m.id === match?.id
-                ? { ...m, scores_csv: matchAxios.scores_csv }
+                ? { ...m, scores_csv: matchAxios.scores_csv || "0-0" }
                 : m
             ),
           })
@@ -95,18 +95,18 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
                 ...tournament,
                 matches: tournament?.matches?.map((m) =>
                   m.id === match?.id
-                    ? { ...m, scores_csv: matchAxios.scores_csv }
+                    ? { ...m, scores_csv: matchAxios.scores_csv || "0-0" }
                     : m
                 ),
               },
               matches_today: matches_today?.map((m) =>
                 m.id === matchAxios?.id
-                  ? { ...m, scores_csv: matchAxios.scores_csv }
+                  ? { ...m, scores_csv: matchAxios.scores_csv || "0-0" }
                   : m
               ),
               match:
                 matchWS?.id === matchAxios.id
-                  ? { ...matchWS, scores_csv: matchAxios.scores_csv }
+                  ? { ...matchWS, scores_csv: matchAxios.scores_csv || "0-0" }
                   : matchWS,
             });
             onClose();
@@ -131,7 +131,7 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
       let SSSarray = ss
         ?.map((sss, ii) => {
           if (ii !== playerIndex) return sss;
-          return value;
+          return parseInt(value);
         })
         .filter((sss) => sss !== s);
 
@@ -207,7 +207,7 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
                     type="number"
                   />
                   <TextField
-                    label="Team 1 Score"
+                    label="Team 2 Score"
                     value={team2}
                     onChange={handleChange(2, i)}
                     type="number"

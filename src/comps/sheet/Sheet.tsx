@@ -16,7 +16,7 @@ const makeComponentStyles = makeStyles((theme) => ({
     position: "relative",
     display: "flex",
     flexDirection: "column",
-    marginTop: 30,
+    height: "100%",
   },
   loader: {
     position: "absolute",

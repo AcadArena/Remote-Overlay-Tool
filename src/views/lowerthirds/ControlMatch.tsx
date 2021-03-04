@@ -176,7 +176,7 @@ const ControlMatch: React.FC<RouteComponentProps> = ({ history }) => {
 
   return (
     <Sheet loading={loading}>
-      <SheetHead color="red">Match</SheetHead>
+      <SheetHead color="orange">Match</SheetHead>
       <SheetBody>
         <RadioButton
           checked={match_live}

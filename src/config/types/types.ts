@@ -19,6 +19,38 @@ export interface Live {
   matches_next?: Match[];
   websocket_users: WebsocketUser[];
   room: string;
+  countdown_minutes?: number;
+  stat_player?: PlayerStatProps;
+  stat_player_vs?: StatPlayerVsProps;
+  stat_team_vs?: TeamVsProps;
+  swap_team_positions?: boolean;
+}
+
+export interface TeamVsProps {
+  team1: TeamStatProps;
+  team2: TeamStatProps;
+  stat_names: string[];
+  [key: string]: PlayerStatProps | any;
+}
+export interface TeamStatProps extends Participant {
+  stats: Stat[];
+}
+
+export interface StatPlayerVsProps {
+  player1: PlayerStatProps;
+  player2: PlayerStatProps;
+  stat_names: string[];
+  [key: string]: PlayerStatProps | any;
+}
+
+export interface PlayerStatProps extends Player {
+  stats: Stat[];
+}
+
+export interface Stat {
+  stat_name: string;
+  stat_value: string;
+  isOn: boolean;
 }
 
 export interface Caster {
