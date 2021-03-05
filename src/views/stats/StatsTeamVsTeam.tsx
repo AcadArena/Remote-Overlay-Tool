@@ -173,14 +173,14 @@ const StatsTeamVsTeam = () => {
       team1: {
         ...form.team1,
         stats: [
-          ...(form.team1.stats ?? []),
+          ...form.team1.stats,
           { stat_name: statInput, stat_value: "", isOn: true },
         ],
       },
       team2: {
         ...form.team2,
         stats: [
-          ...(form.team2.stats ?? []),
+          ...form.team2.stats,
           { stat_name: statInput, stat_value: "", isOn: true },
         ],
       },
@@ -194,10 +194,9 @@ const StatsTeamVsTeam = () => {
       ...form,
       [team]: {
         ...form[team],
-        stats:
-          form[team].stats.map((s: Stat, ii: number) =>
-            i === ii ? { ...s, [name]: value } : s
-          ) ?? [],
+        stats: form[team].stats.map((s: Stat, ii: number) =>
+          i === ii ? { ...s, [name]: value } : s
+        ),
       },
     });
   };
@@ -324,17 +323,15 @@ const StatsTeamVsTeam = () => {
                       ...form,
                       team1: {
                         ...form.team1,
-                        stats:
-                          form.team1.stats.map((s: Stat, ii: number) =>
-                            i === ii ? { ...s, isOn: !s.isOn } : s
-                          ) ?? [],
+                        stats: form.team1.stats.map((s: Stat, ii: number) =>
+                          i === ii ? { ...s, isOn: !s.isOn } : s
+                        ),
                       },
                       team2: {
                         ...form.team2,
-                        stats:
-                          form.team2.stats.map((s: Stat, ii: number) =>
-                            i === ii ? { ...s, isOn: !s.isOn } : s
-                          ) ?? [],
+                        stats: form.team2.stats.map((s: Stat, ii: number) =>
+                          i === ii ? { ...s, isOn: !s.isOn } : s
+                        ),
                       },
                     })
                   }
@@ -427,7 +424,10 @@ const SelectionItems = (
       onClick={() => {
         setForm({
           ...form,
-          [teamNumber]: { ...team, stats: form[teamNumber].stats ?? [] },
+          [teamNumber]: {
+            ...team,
+            stats: [...(form[teamNumber]?.stats ?? [])],
+          },
         });
         onClose();
       }}
