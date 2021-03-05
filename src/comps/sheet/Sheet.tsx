@@ -15,6 +15,7 @@ const makeComponentStyles = makeStyles((theme) => ({
     boxShadow: "0 1px 4px 0 rgba(0,0,0, .14)",
     position: "relative",
     display: "flex",
+    marginTop: 20,
     flexDirection: "column",
     height: "100%",
   },

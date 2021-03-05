@@ -23,7 +23,18 @@ export interface Live {
   stat_player?: PlayerStatProps;
   stat_player_vs?: StatPlayerVsProps;
   stat_team_vs?: TeamVsProps;
+  game_number?: number;
   swap_team_positions?: boolean;
+  container_mode?:
+    | "schedule"
+    | "bracket"
+    | "standings_group_a"
+    | "standings_group_b"
+    | "highlights"
+    | "stats_team_vs"
+    | "stats_player"
+    | "stats_player_vs"
+    | "ending";
 }
 
 export interface TeamVsProps {
@@ -66,7 +77,8 @@ export type LowerThirdsMode =
   | "casters"
   | "long"
   | "playerStats"
-  | "playerQuote";
+  | "playerQuote"
+  | "veto";
 export interface LowerThirds {
   headline: string;
   ticker: string;
@@ -180,5 +192,26 @@ export interface Match {
   suggested_play_order: number;
   prerequisite_match_ids_csv: string;
   scores_csv: string;
+  veto?: VetoItem[];
+  badge?: string;
   [key: string]: any;
 }
+
+export interface VetoItem {
+  team: {
+    org_name: string;
+    university_name: string;
+    university_acronym: string;
+    logo: string;
+  };
+  type: "ban" | "pick";
+  map: ValorantMap;
+  winner?: {
+    org_name: string;
+    university_name: string;
+    university_acronym: string;
+    logo: string;
+  };
+}
+
+export type ValorantMap = "ascent" | "bind" | "haven" | "icebox" | "split";

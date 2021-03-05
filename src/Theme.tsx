@@ -29,7 +29,7 @@ const Theme: React.FC = ({ children }) => {
           dark: "#6d1b7b",
         },
         secondary: {
-          main: "#FFD303",
+          main: "#e53935",
         },
       },
     })

@@ -13,6 +13,7 @@ import { projectFirestore } from "../../config/firebase/config";
 import swal from "sweetalert";
 import SheetSection from "../../comps/sheet/SheetSection";
 import TextField from "../../comps/textfield/TextField";
+import ControlMatchPopupVeto from "./ControlMatchPopupVeto";
 
 interface ControlMatchPopupProps {
   open: boolean;
@@ -56,10 +57,13 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
   const ws = React.useContext(wsContext);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [scores, setScores] = React.useState<string>("0-0");
+  const [vetoState, setVetoState] = React.useState<boolean>(false);
+  const [badge, setBadge] = React.useState<string>("");
 
   React.useEffect(() => {
     if (!match) return;
     setScores(match?.scores_csv || "0-0");
+    setBadge(match?.badge ?? "");
   }, [match, setScores]);
 
   const selectMatch = () => {
@@ -149,16 +153,17 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
             ? {
                 ...m,
                 scores_csv: scores,
+                badge: badge,
               }
             : m
         ),
       },
       matches_today: matches_today?.map((m) =>
-        m.id === match?.id ? { ...m, scores_csv: scores } : m
+        m.id === match?.id ? { ...m, scores_csv: scores, badge: badge } : m
       ),
       match:
         matchWS?.id === match?.id
-          ? { ...matchWS, scores_csv: scores }
+          ? { ...matchWS, scores_csv: scores, badge: badge }
           : matchWS,
     });
     onClose();
@@ -187,8 +192,16 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
             >
               Select This Match
             </Button>
-            <Button color="secondary" variant="contained" onClick={refresh}>
+            <Button
+              color="secondary"
+              variant="contained"
+              onClick={refresh}
+              style={{ marginRight: 10 }}
+            >
               Fetch Score
+            </Button>
+            <Button variant="contained" onClick={() => setVetoState(true)}>
+              Veto
             </Button>
           </SheetSection>
 
@@ -224,18 +237,31 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
             >
               Add Match
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              style={{ marginTop: 10 }}
-              onClick={apply}
-              fullWidth
-            >
-              Apply Changes
-            </Button>
           </SheetSection>
+          <SheetSection>
+            <Typography variant="h4">Schedule (text)</Typography>
+            <TextField
+              value={badge}
+              onChange={({ currentTarget: { value } }) => setBadge(value)}
+            />
+          </SheetSection>
+          <Button
+            variant="contained"
+            color="primary"
+            style={{ marginTop: 10 }}
+            onClick={apply}
+            fullWidth
+          >
+            Apply Changes
+          </Button>
         </SheetBody>
       </Sheet>
+      <ControlMatchPopupVeto
+        open={vetoState}
+        match={match}
+        title={title}
+        onClose={() => setVetoState(false)}
+      />
     </Dialog>
   );
 };

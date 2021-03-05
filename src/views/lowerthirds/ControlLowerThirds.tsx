@@ -155,7 +155,7 @@ const ControlLowerThirds = () => {
   const ws = React.useContext(wsContext);
 
   const live = useSelector((state: ReduxState) => state.live);
-  const { lowerThirds, tournament } = live;
+  const { lowerThirds, tournament, match } = live;
 
   React.useEffect(() => {
     if (!lowerThirds) return;
@@ -221,6 +221,12 @@ const ControlLowerThirds = () => {
               label="Player Quote"
               disabled={!Boolean(form.player)}
               onClick={selectMode("playerQuote")}
+            />
+            <RadioButton
+              checked={form.mode === "veto"}
+              label="Veto"
+              disabled={!Boolean(match?.veto?.length)}
+              onClick={selectMode("veto")}
             />
           </RadioButtonContainer>
         </SheetSection>

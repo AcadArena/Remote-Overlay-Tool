@@ -17,6 +17,8 @@ import StatsPage from "./views/stats/StatsPage";
 import WebsocketDialog from "./comps/connection/WebsocketDialog";
 import { wsContext } from "./config/websocket/WebsocketProvider";
 import TimerPage from "./views/timer/TimerPage";
+import ContainerPage from "./views/container/ContainerPage";
+import LinkPage from "./views/links/LinkPage";
 
 const makeComponentStyles = makeStyles((theme) => ({
   app: {
@@ -75,6 +77,12 @@ function App() {
                 </Route>
                 <Route exact path="/stats">
                   <StatsPage />
+                </Route>
+                <Route exact path="/container">
+                  <ContainerPage />
+                </Route>
+                <Route exact path="/links">
+                  <LinkPage />
                 </Route>
               </Switch>
             </div>

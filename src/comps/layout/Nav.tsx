@@ -21,11 +21,13 @@ import AccessTimeIcon from "@material-ui/icons/AccessTime";
 import BarChartIcon from "@material-ui/icons/BarChart";
 import CallToActionIcon from "@material-ui/icons/CallToAction";
 import { ReactComponent as BattleIcon } from "../assets/battle.svg";
-
+import LinkIcon from "@material-ui/icons/Link";
+import ChromeReaderModeIcon from "@material-ui/icons/ChromeReaderMode";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import clsx from "clsx";
 import { ReduxState } from "../../config/types/types";
 import { useSelector } from "react-redux";
+import { wsContext } from "../../config/websocket/WebsocketProvider";
 
 const drawerWdith = 260;
 
@@ -112,6 +114,8 @@ const navData = [
   { title: "Lower Thirds", url: "/lowerthirds", icon: <CallToActionIcon /> },
   { title: "Timer", url: "/timer", icon: <AccessTimeIcon /> },
   { title: "Stats", url: "/stats", icon: <BarChartIcon /> },
+  { title: "Container", url: "/container", icon: <ChromeReaderModeIcon /> },
+  { title: "Links", url: "/links", icon: <LinkIcon /> },
 ];
 
 const Nav: React.FC<RouteComponentProps> = ({
@@ -120,9 +124,10 @@ const Nav: React.FC<RouteComponentProps> = ({
 }) => {
   const classes = makeComponentStyles();
   const [anchorEl, setAnchorEl] = React.useState<any>(null);
-  const { websocket_users, room } = useSelector(
+  const { websocket_users, room, swap_team_positions = false } = useSelector(
     (state: ReduxState) => state.live
   );
+  const ws = React.useContext(wsContext);
 
   return (
     <Drawer
@@ -151,6 +156,22 @@ const Nav: React.FC<RouteComponentProps> = ({
             </ListItem>
           ))}
         </List>
+
+        <div style={{ padding: 20 }}>
+          <Button
+            fullWidth
+            color="primary"
+            variant="contained"
+            style={{
+              backgroundColor: swap_team_positions ? "#e53935" : "#8e24aa",
+            }}
+            onClick={() =>
+              ws.setLiveSettings({ swap_team_positions: !swap_team_positions })
+            }
+          >
+            Switch Sides
+          </Button>
+        </div>
 
         <Button
           className={classes.ws}
