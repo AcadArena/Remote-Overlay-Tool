@@ -17,6 +17,7 @@ import { projectFirestore as db } from "../../config/firebase/config";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
 import SaveIcon from "@material-ui/icons/Save";
 import CheckIcon from "@material-ui/icons/Check";
+import ControlMatchPopup from "./MatchPopup";
 
 export const getFinalScore = (score: string) => {
   const scores: string[] = score.split(",");
@@ -142,6 +143,8 @@ const MatchesSelection = () => {
     (state: ReduxState) => state.live
   );
   const [selected, setSelected] = React.useState<Match | undefined>();
+  const [dialogMatch, setDialogMatch] = React.useState<Match | undefined>();
+  const [state, setState] = React.useState<boolean>(false);
   const ws = React.useContext(wsContext);
 
   React.useEffect(() => {
@@ -210,17 +213,19 @@ const MatchesSelection = () => {
   };
 
   const selectMatch = (m: Match) => (e: MouseEvent) => {
-    if (e.ctrlKey) {
-      if (!matches_today.some((mm) => mm.id === m.id)) {
-        ws.setLiveSettings({ matches_today: [...matches_today, m] });
-      } else {
-        ws.setLiveSettings({
-          matches_today: matches_today.filter((mm) => mm.id !== m.id),
-        });
-      }
-    } else {
-      ws.setLiveSettings({ match: m });
-    }
+    // if (e.ctrlKey) {
+    //   if (!matches_today.some((mm) => mm.id === m.id)) {
+    //     ws.setLiveSettings({ matches_today: [...matches_today, m] });
+    //   } else {
+    //     ws.setLiveSettings({
+    //       matches_today: matches_today.filter((mm) => mm.id !== m.id),
+    //     });
+    //   }
+    // } else {
+    //   ws.setLiveSettings({ match: m });
+    // }
+    setDialogMatch(m);
+    setState(true);
   };
 
   const findScheduleIndex = (m: Match): number => {
@@ -231,7 +236,9 @@ const MatchesSelection = () => {
     <Sheet loading={loading}>
       <SheetHead>
         <SheetHeadTitle>Matches</SheetHeadTitle>
-        <SheetHeadSub>Match Directory</SheetHeadSub>
+        <SheetHeadSub>
+          Fetched from challonge and saved to database
+        </SheetHeadSub>
       </SheetHead>
       <SheetBody>
         {/* ACTIONS */}
@@ -327,13 +334,22 @@ const MatchesSelection = () => {
                     key={match.id}
                     className={classes.match}
                     variant="outlined"
-                    onClick={() =>
-                      ws.setLiveSettings({
-                        matches_today: matches_today.filter(
-                          (mm) => mm.id !== match.id
-                        ),
-                      })
-                    }
+                    onClick={() => {
+                      swal({
+                        title: "Remove match schedule?",
+                        icon: "warning",
+                        dangerMode: true,
+                        buttons: ["Cancel", true],
+                      }).then((value) => {
+                        if (value) {
+                          ws.setLiveSettings({
+                            matches_today: matches_today.filter(
+                              (mm) => mm.id !== match.id
+                            ),
+                          });
+                        }
+                      });
+                    }}
                   >
                     {/* Team1 */}
                     <div className="t1 team">
@@ -570,7 +586,17 @@ const MatchesSelection = () => {
           </>
         )}
       </SheetBody>
+
       <SheetFooter>Fetched from challonge and saved to database</SheetFooter>
+
+      <ControlMatchPopup
+        match={dialogMatch}
+        open={state}
+        onClose={() => setState(false)}
+        title={`${getTeamName(dialogMatch?.player1_id || 0)} VS ${getTeamName(
+          dialogMatch?.player2_id || 0
+        )}`}
+      ></ControlMatchPopup>
     </Sheet>
   );
 };
