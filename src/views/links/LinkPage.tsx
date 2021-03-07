@@ -59,6 +59,13 @@ const LinkPage = () => {
       >
         Ingame
       </a>
+      <a
+        style={{ margin: 10, textDecoration: "none" }}
+        href="https://aa-uac.web.app/vs"
+        target="_blank"
+      >
+        VS Screen
+      </a>
     </div>
   );
 };
