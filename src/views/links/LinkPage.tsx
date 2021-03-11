@@ -108,67 +108,89 @@ const LinkPage = () => {
               >
                 VS Screen
               </Button>
-              {/* <a
-                style={{ margin: 10, textDecoration: "none" }}
-                href="https://aa-uac.web.app/castercam"
-                target="_blank"
-              ></a>
-              <a
-                style={{ margin: 10, textDecoration: "none" }}
-                href="https://aa-uac.web.app/castercam?alt=1"
-                target="_blank"
+            </div>
+          </SheetBody>
+        </Sheet>
+      </Grid>
+      <Grid item xs={12} md={6} lg={4} xl={3}>
+        <Sheet>
+          <SheetHead>
+            <SheetHeadTitle>NCO</SheetHeadTitle>
+          </SheetHead>
+          <SheetBody>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <Button
+                variant="outlined"
+                endIcon={<OpenInNewIcon />}
+                color="primary"
+                className={classes.button}
+                onClick={goto("https://aa-nco.web.app/castercam")}
               >
-                CasterCam ALTERNATE
-              </a>
-              <a
-                style={{ margin: 10, textDecoration: "none" }}
-                href="https://aa-uac.web.app/timer"
-                target="_blank"
+                CasterCam
+              </Button>
+              <Button
+                variant="outlined"
+                endIcon={<OpenInNewIcon />}
+                color="primary"
+                className={classes.button}
+                onClick={goto("https://aa-nco.web.app/timer")}
               >
-                TIMER
-              </a>
-              <a
-                style={{ margin: 10, textDecoration: "none" }}
-                href="https://aa-uac.web.app/content"
-                target="_blank"
+                Timer
+              </Button>
+              <Button
+                variant="outlined"
+                endIcon={<OpenInNewIcon />}
+                color="primary"
+                className={classes.button}
+                onClick={goto("https://aa-nco.web.app/ticker")}
+              >
+                Ticker Only
+              </Button>
+              <Button
+                variant="outlined"
+                endIcon={<OpenInNewIcon />}
+                color="primary"
+                className={classes.button}
+                onClick={goto("https://aa-nco.web.app/content")}
               >
                 Modular Banner
-              </a>
-              <a
-                style={{ margin: 10, textDecoration: "none" }}
-                href="https://aa-uac.web.app/winner1"
-                target="_blank"
+              </Button>
+              <Button
+                variant="outlined"
+                endIcon={<OpenInNewIcon />}
+                color="primary"
+                className={classes.button}
+                onClick={goto("https://aa-nco.web.app/winner")}
               >
-                TEAM 1 WINNER
-              </a>
-              <a
-                style={{ margin: 10, textDecoration: "none" }}
-                href="https://aa-uac.web.app/winner2"
-                target="_blank"
-              >
-                TEAM 2 WINNER
-              </a>
-              <a
-                style={{ margin: 10, textDecoration: "none" }}
-                href="https://aa-uac.web.app/drafting"
-                target="_blank"
+                Winner
+              </Button>
+              <Button
+                variant="outlined"
+                endIcon={<OpenInNewIcon />}
+                color="primary"
+                className={classes.button}
+                onClick={goto("https://aa-nco.web.app/drafting")}
               >
                 Draft
-              </a>
-              <a
-                style={{ margin: 10, textDecoration: "none" }}
-                href="https://aa-uac.web.app/ingame"
-                target="_blank"
+              </Button>
+              <Button
+                variant="outlined"
+                endIcon={<OpenInNewIcon />}
+                color="primary"
+                className={classes.button}
+                onClick={goto("https://aa-nco.web.app/ingame")}
               >
                 Ingame
-              </a>
-              <a
-                style={{ margin: 10, textDecoration: "none" }}
-                href="https://aa-uac.web.app/vs"
-                target="_blank"
+              </Button>
+              <Button
+                variant="outlined"
+                endIcon={<OpenInNewIcon />}
+                color="primary"
+                className={classes.button}
+                onClick={goto("https://aa-nco.web.app/vs")}
               >
                 VS Screen
-              </a> */}
+              </Button>
             </div>
           </SheetBody>
         </Sheet>
