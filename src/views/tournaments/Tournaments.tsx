@@ -7,7 +7,10 @@ import SheetBody from "../../comps/sheet/SheetBody";
 import SheetHead from "../../comps/sheet/SheetHead";
 import SheetHeadTitle from "../../comps/sheet/SheetHeadTitle";
 import SheetSection from "../../comps/sheet/SheetSection";
-import { projectFirestore as db } from "../../config/firebase/config";
+import {
+  projectFirestore as db,
+  projectStorage,
+} from "../../config/firebase/config";
 import {
   Match,
   Participant,
@@ -31,12 +34,21 @@ import {
 import AddIcon from "@material-ui/icons/Add";
 import CheckIcon from "@material-ui/icons/Check";
 import SaveOutlinedIcon from "@material-ui/icons/SaveOutlined";
+import ImageIcon from "@material-ui/icons/Image";
 import { green } from "@material-ui/core/colors";
 import RadioButton from "../../comps/radiobutton/RadioButton";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
 import SheetFooter from "../../comps/sheet/SheetFooter";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import RefreshIcon from "@material-ui/icons/Refresh";
+
+const fileTypes = [
+  "image/png",
+  "image/jpeg",
+  "image/gif",
+  "image/svg",
+  "image/svg+xml",
+];
 
 const makeCompStyles = makeStyles((theme) => ({
   tournamentsContainer: {},
@@ -107,91 +119,159 @@ const Tournaments = () => {
   };
 
   const refresh = (t: Tournament) => () => {
-    const apiKey = "J4V1S6QqJQS6FFcHUKoq6zI3P1r0sddPxB7zcCbC";
-    const username = "manoku";
-    setLoading(true);
-    axios
-      .get(
-        `https://api.challonge.com/v1/tournaments/${t.uid}.json?api_key=${apiKey}&include_participants=1&include_matches=1`
-      )
-      .then(({ data: { tournament } }) => {
-        setLoading(false);
-        ws.setLiveSettings({
-          tournament: {
-            id: tournament.id,
-            name: tournament.name,
-            tournament_type: tournament.tournament_type,
-            started_at: tournament.started_at,
-            completed_at: tournament.completed_at,
-            created_at: tournament.created_at,
-            updated_at: tournament.updated_at,
-            state: tournament.state,
-            ranked_by: tournament.ranked_by,
-            group_stages_enabled: tournament.group_stages_enabled,
-            teams: tournament.teams,
-            participants_count: tournament.participants_count,
-            participants: tournament.participants.map(
-              ({ participant }: any): Participant => ({
-                id: participant.id,
-                tournament_id: participant.tournament_id,
-                name: participant.name,
-                seed: participant.seed,
-                active: participant.active,
-                created_at: participant.created_at,
-                updated_at: participant.updated_at,
-                final_rank: participant.final_rank,
-                on_waiting_list: participant.on_waiting_list,
-                display_name_with_invitation_email_address:
-                  participant.display_name_with_invitation_email_address,
-                display_name: participant.display_name,
-                group_player_ids: participant.group_player_ids,
-              })
-            ),
-            matches: tournament.matches.map(({ match }: Match): Match => match),
-            subdomain: tournament.subdomain,
-            url: tournament.url,
-            game_name: tournament.game_name,
-          },
-        });
+    swal({
+      title: "Refresh tournament data?",
+      text: "Are you sure?",
+      dangerMode: true,
+      buttons: ["I changed my mind", true],
+    }).then((value) => {
+      if (value) {
+        const apiKey = "J4V1S6QqJQS6FFcHUKoq6zI3P1r0sddPxB7zcCbC";
+        const username = "manoku";
+        setLoading(true);
+        axios
+          .get(
+            `https://api.challonge.com/v1/tournaments/${t.uid}.json?api_key=${apiKey}&include_participants=1&include_matches=1`
+          )
+          .then(({ data: { tournament } }) => {
+            setLoading(false);
+            ws.setLiveSettings({
+              tournament: {
+                id: tournament.id,
+                name: tournament.name,
+                tournament_type: tournament.tournament_type,
+                started_at: tournament.started_at,
+                completed_at: tournament.completed_at,
+                created_at: tournament.created_at,
+                updated_at: tournament.updated_at,
+                state: tournament.state,
+                ranked_by: tournament.ranked_by,
+                group_stages_enabled: tournament.group_stages_enabled,
+                teams: tournament.teams,
+                participants_count: tournament.participants_count,
+                participants: tournament.participants.map(
+                  ({ participant }: any): Participant => ({
+                    id: participant.id,
+                    tournament_id: participant.tournament_id,
+                    name: participant.name,
+                    seed: participant.seed,
+                    active: participant.active,
+                    created_at: participant.created_at,
+                    updated_at: participant.updated_at,
+                    final_rank: participant.final_rank,
+                    on_waiting_list: participant.on_waiting_list,
+                    display_name_with_invitation_email_address:
+                      participant.display_name_with_invitation_email_address,
+                    display_name: participant.display_name,
+                    group_player_ids: participant.group_player_ids,
+                  })
+                ),
+                matches: tournament.matches.map(
+                  ({ match }: Match): Match => match
+                ),
+                subdomain: tournament.subdomain,
+                url: tournament.url,
+                game_name: tournament.game_name,
+              },
+            });
 
-        db.collection("tournaments")
-          .doc(t.uid)
-          .set({
-            id: tournament.id,
-            name: tournament.name,
-            tournament_type: tournament.tournament_type,
-            started_at: tournament.started_at,
-            completed_at: tournament.completed_at,
-            created_at: tournament.created_at,
-            updated_at: tournament.updated_at,
-            state: tournament.state,
-            ranked_by: tournament.ranked_by,
-            group_stages_enabled: tournament.group_stages_enabled,
-            teams: tournament.teams,
-            participants_count: tournament.participants_count,
-            participants: tournament.participants.map(
-              ({ participant }: any): Participant => ({
-                id: participant.id,
-                tournament_id: participant.tournament_id,
-                name: participant.name,
-                seed: participant.seed,
-                active: participant.active,
-                created_at: participant.created_at,
-                updated_at: participant.updated_at,
-                final_rank: participant.final_rank,
-                on_waiting_list: participant.on_waiting_list,
-                display_name_with_invitation_email_address:
-                  participant.display_name_with_invitation_email_address,
-                display_name: participant.display_name,
-                group_player_ids: participant.group_player_ids,
-              })
-            ),
-            matches: tournament.matches.map(({ match }: Match): Match => match),
-            subdomain: tournament.subdomain,
-            url: tournament.url,
-            game_name: tournament.game_name,
+            db.collection("tournaments")
+              .doc(t.uid)
+              .set({
+                id: tournament.id,
+                name: tournament.name,
+                tournament_type: tournament.tournament_type,
+                started_at: tournament.started_at,
+                completed_at: tournament.completed_at,
+                created_at: tournament.created_at,
+                updated_at: tournament.updated_at,
+                state: tournament.state,
+                ranked_by: tournament.ranked_by,
+                group_stages_enabled: tournament.group_stages_enabled,
+                teams: tournament.teams,
+                participants_count: tournament.participants_count,
+                participants: tournament.participants.map(
+                  ({ participant }: any): Participant => ({
+                    id: participant.id,
+                    tournament_id: participant.tournament_id,
+                    name: participant.name,
+                    seed: participant.seed,
+                    active: participant.active,
+                    created_at: participant.created_at,
+                    updated_at: participant.updated_at,
+                    final_rank: participant.final_rank,
+                    on_waiting_list: participant.on_waiting_list,
+                    display_name_with_invitation_email_address:
+                      participant.display_name_with_invitation_email_address,
+                    display_name: participant.display_name,
+                    group_player_ids: participant.group_player_ids,
+                  })
+                ),
+                matches: tournament.matches.map(
+                  ({ match }: Match): Match => match
+                ),
+                subdomain: tournament.subdomain,
+                url: tournament.url,
+                game_name: tournament.game_name,
+              });
           });
-      });
+      }
+    });
+  };
+
+  const fileSelect = (t: Tournament, destination: string = "Logos/") => ({
+    target: { files, name },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    const image = files?.length ? files[0] : null;
+    if (image) {
+      uploadFile({ file: image, destination, name, tournament: t });
+    }
+  };
+
+  const uploadFile = ({
+    file,
+    destination,
+    name,
+    tournament,
+  }: {
+    file: File;
+    destination: string;
+    name: string;
+    tournament: Tournament;
+  }) => {
+    const storageRef = projectStorage.ref(destination + file.name);
+
+    storageRef.put(file).on(
+      "state_change",
+
+      // Upload state change event
+      (snapshot) => {
+        let percentage = Math.ceil(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        setLoading(true);
+      },
+
+      //  on error event
+      (error) => {
+        setLoading(false);
+      },
+
+      //  on upload finish
+      async () => {
+        const url = await storageRef.getDownloadURL();
+        setLoading(false);
+        db.collection("tournaments")
+          .doc(tournament.url)
+          .set({
+            ...tournament,
+            logo: url,
+          })
+          .then(() => {
+            ws.setLiveSettings({ tournament: { ...tournament, logo: url } });
+          });
+      }
+    );
   };
 
   return (
@@ -227,6 +307,16 @@ const Tournaments = () => {
                             </IconButton>
                             <IconButton onClick={refresh(t)}>
                               <RefreshIcon />
+                            </IconButton>
+                            <IconButton component="label">
+                              <ImageIcon />
+                              <input
+                                type="file"
+                                hidden
+                                name="logo"
+                                accept={fileTypes.join(", ")}
+                                onChange={fileSelect(t, "Casters/")}
+                              />
                             </IconButton>
                           </RadioButton>
                         ))}
@@ -373,7 +463,7 @@ const AddTournament: React.FC<AddTournament> = ({ open, onClose }) => {
               group_player_ids: participant.group_player_ids,
             })
           ),
-          matches: [],
+          matches: tournament.matches.map(({ match }: Match): Match => match),
           subdomain: tournament.subdomain,
           url: tournament.url,
           game_name: tournament.game_name,

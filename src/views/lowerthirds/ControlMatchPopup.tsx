@@ -14,7 +14,11 @@ import swal from "sweetalert";
 import SheetSection from "../../comps/sheet/SheetSection";
 import TextField from "../../comps/textfield/TextField";
 import ControlMatchPopupVeto from "./ControlMatchPopupVeto";
-
+import {
+  KeyboardDateTimePicker,
+  MuiPickersUtilsProvider,
+} from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
 interface ControlMatchPopupProps {
   open: boolean;
   match?: Match;
@@ -59,11 +63,17 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
   const [scores, setScores] = React.useState<string>("0-0");
   const [vetoState, setVetoState] = React.useState<boolean>(false);
   const [badge, setBadge] = React.useState<string>("");
+  const [scheduleDate, setScheduleDate] = React.useState<Date | null>(
+    new Date()
+  );
 
   React.useEffect(() => {
     if (!match) return;
     setScores(match?.scores_csv || "0-0");
     setBadge(match?.badge ?? "");
+    if (match.schedule) {
+      setScheduleDate(match?.schedule ?? new Date());
+    }
   }, [match, setScores]);
 
   const selectMatch = () => {
@@ -88,7 +98,12 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
             ...tournament,
             matches: tournament?.matches?.map((m) =>
               m.id === match?.id
-                ? { ...m, scores_csv: matchAxios.scores_csv || "0-0" }
+                ? {
+                    ...m,
+                    scores_csv: matchAxios.scores_csv || "0-0",
+                    badge: badge,
+                    schedule: scheduleDate,
+                  }
                 : m
             ),
           })
@@ -99,18 +114,33 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
                 ...tournament,
                 matches: tournament?.matches?.map((m) =>
                   m.id === match?.id
-                    ? { ...m, scores_csv: matchAxios.scores_csv || "0-0" }
+                    ? {
+                        ...m,
+                        scores_csv: matchAxios.scores_csv || "0-0",
+                        badge: badge,
+                        schedule: scheduleDate,
+                      }
                     : m
                 ),
               },
               matches_today: matches_today?.map((m) =>
                 m.id === matchAxios?.id
-                  ? { ...m, scores_csv: matchAxios.scores_csv || "0-0" }
+                  ? {
+                      ...m,
+                      scores_csv: matchAxios.scores_csv || "0-0",
+                      badge: badge,
+                      schedule: scheduleDate,
+                    }
                   : m
               ),
               match:
                 matchWS?.id === matchAxios.id
-                  ? { ...matchWS, scores_csv: matchAxios.scores_csv || "0-0" }
+                  ? {
+                      ...matchWS,
+                      scores_csv: matchAxios.scores_csv || "0-0",
+                      badge: badge,
+                      schedule: scheduleDate,
+                    }
                   : matchWS,
             });
             onClose();
@@ -145,8 +175,11 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
   };
 
   const apply = () => {
-    ws.setLiveSettings({
-      tournament: {
+    setLoading(true);
+    projectFirestore
+      .collection("tournaments")
+      .doc(tournament?.url)
+      .set({
         ...tournament,
         matches: tournament?.matches.map((m) =>
           m.id === match?.id
@@ -154,23 +187,102 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
                 ...m,
                 scores_csv: scores,
                 badge: badge,
+                schedule: scheduleDate,
               }
             : m
         ),
-      },
-      matches_today: matches_today?.map((m) =>
-        m.id === match?.id ? { ...m, scores_csv: scores, badge: badge } : m
-      ),
-      match:
-        matchWS?.id === match?.id
-          ? { ...matchWS, scores_csv: scores, badge: badge }
-          : matchWS,
-    });
-    onClose();
+      })
+      .then(() => {
+        ws.setLiveSettings({
+          tournament: {
+            ...tournament,
+            matches: tournament?.matches.map((m) =>
+              m.id === match?.id
+                ? {
+                    ...m,
+                    scores_csv: scores,
+                    badge: badge,
+                    schedule: scheduleDate,
+                  }
+                : m
+            ),
+          },
+          matches_today: matches_today?.map((m) =>
+            m.id === match?.id
+              ? {
+                  ...m,
+                  scores_csv: scores,
+                  badge: badge,
+                  schedule: scheduleDate,
+                }
+              : m
+          ),
+          match:
+            matchWS?.id === match?.id
+              ? {
+                  ...matchWS,
+                  scores_csv: scores,
+                  badge: badge,
+                  schedule: scheduleDate,
+                }
+              : matchWS,
+        });
+        setLoading(false);
+        onClose();
+      })
+      .catch((err) => {
+        setLoading(false);
+        ws.setLiveSettings({
+          tournament: {
+            ...tournament,
+            matches: tournament?.matches.map((m) =>
+              m.id === match?.id
+                ? {
+                    ...m,
+                    scores_csv: scores,
+                    badge: badge,
+                    schedule: scheduleDate,
+                  }
+                : m
+            ),
+          },
+          matches_today: matches_today?.map((m) =>
+            m.id === match?.id
+              ? {
+                  ...m,
+                  scores_csv: scores,
+                  badge: badge,
+                  schedule: scheduleDate,
+                }
+              : m
+          ),
+          match:
+            matchWS?.id === match?.id
+              ? {
+                  ...matchWS,
+                  scores_csv: scores,
+                  badge: badge,
+                  schedule: scheduleDate,
+                }
+              : matchWS,
+        });
+
+        swal({
+          title: "Something went wrong",
+          text: `${err.code}, could not save to database but still sent to websocket`,
+          icon: "error",
+        }).then(() => {
+          onClose();
+        });
+      });
   };
 
   const addMatch = () => {
     setScores(scores + ",0-0");
+  };
+
+  const handleDateChange = (date: Date | null) => {
+    setScheduleDate(date);
   };
 
   return (
@@ -206,7 +318,7 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
           </SheetSection>
 
           <SheetSection>
-            <Typography>Manual Scores</Typography>
+            <Typography variant="h4">🆚 Manual Scores</Typography>
             {scores.split(",").map((score, i) => {
               let ss = score.match(/^(\d*)-(\d*)/);
               let team1 = ss?.length ? ss[1] : 0;
@@ -239,11 +351,24 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
             </Button>
           </SheetSection>
           <SheetSection>
-            <Typography variant="h4">Schedule (text)</Typography>
-            <TextField
+            <Typography variant="h4">📆 Schedule</Typography>
+            {/* <TextField
               value={badge}
               onChange={({ currentTarget: { value } }) => setBadge(value)}
-            />
+            /> */}
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <KeyboardDateTimePicker
+                margin="normal"
+                id="date-picker-dialog"
+                label="Date picker dialog"
+                format="MM/dd/yyyy — hh:mm a"
+                value={scheduleDate}
+                onChange={handleDateChange}
+                KeyboardButtonProps={{
+                  "aria-label": "change date",
+                }}
+              />
+            </MuiPickersUtilsProvider>
           </SheetSection>
           <Button
             variant="contained"

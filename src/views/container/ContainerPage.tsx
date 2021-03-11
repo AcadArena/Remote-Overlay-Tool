@@ -1,6 +1,6 @@
 import { Grid } from "@material-ui/core";
 import React from "react";
-import ContainerMode from "./ContainerMode";
+import ContainerMode from "../state/ContainerMode";
 
 const ContainerPage = () => {
   return (

@@ -15,10 +15,10 @@ import ParticipantsPage from "./views/participants/ParticipantsPage";
 import MatchesPage from "./views/matches/MatchesPage";
 import StatsPage from "./views/stats/StatsPage";
 import WebsocketDialog from "./comps/connection/WebsocketDialog";
-import { wsContext } from "./config/websocket/WebsocketProvider";
-import TimerPage from "./views/timer/TimerPage";
-import ContainerPage from "./views/container/ContainerPage";
 import LinkPage from "./views/links/LinkPage";
+import { wsContext } from "./config/websocket/WebsocketProvider";
+import ContainerPage from "./views/container/ContainerPage";
+import StatePage from "./views/state/StatePage";
 
 const makeComponentStyles = makeStyles((theme) => ({
   app: {
@@ -72,8 +72,8 @@ function App() {
                 <Route exact path="/lowerthirds">
                   <Control />
                 </Route>
-                <Route exact path="/timer">
-                  <TimerPage />
+                <Route exact path="/state">
+                  <StatePage />
                 </Route>
                 <Route exact path="/stats">
                   <StatsPage />

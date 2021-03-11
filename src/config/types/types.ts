@@ -23,8 +23,12 @@ export interface Live {
   stat_player?: PlayerStatProps;
   stat_player_vs?: StatPlayerVsProps;
   stat_team_vs?: TeamVsProps;
-  game_number?: number;
+  live_data?: LiveData;
   swap_team_positions?: boolean;
+  match_winner?: {
+    live: boolean;
+    team?: Participant;
+  };
   container_mode?:
     | "schedule"
     | "bracket"
@@ -35,6 +39,13 @@ export interface Live {
     | "stats_player"
     | "stats_player_vs"
     | "ending";
+}
+
+export interface LiveData {
+  split_title: string;
+  stage: string;
+  season: string;
+  ingame: string;
 }
 
 export interface TeamVsProps {
@@ -125,6 +136,7 @@ export interface Tournament {
   participants: Participant[];
   matches: Match[];
   game_name: string;
+  logo?: string;
 }
 
 export interface ParticipantElement {
@@ -194,6 +206,7 @@ export interface Match {
   scores_csv: string;
   veto?: VetoItem[];
   badge?: string;
+  schedule?: Date;
   [key: string]: any;
 }
 
