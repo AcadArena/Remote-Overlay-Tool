@@ -191,6 +191,15 @@ const LinkPage = () => {
               >
                 VS Screen
               </Button>
+              <Button
+                variant="outlined"
+                endIcon={<OpenInNewIcon />}
+                color="primary"
+                className={classes.button}
+                onClick={goto("https://aa-nco.web.app/logo")}
+              >
+                Logo only
+              </Button>
             </div>
           </SheetBody>
         </Sheet>
