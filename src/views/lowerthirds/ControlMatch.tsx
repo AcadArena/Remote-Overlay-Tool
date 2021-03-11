@@ -23,6 +23,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { projectFirestore } from "../../config/firebase/config";
 import ControlMatchPopup from "./ControlMatchPopup";
 import RadioButton from "../../comps/radiobutton/RadioButton";
+import SheetHeadTitle from "../../comps/sheet/SheetHeadTitle";
 
 const ms = makeStyles((theme) => ({
   match: {
@@ -54,7 +55,7 @@ const ms = makeStyles((theme) => ({
           backgroundSize: "80%",
           backgroundRepeat: "no-repeat",
           borderRadius: 3,
-          boxShadow: "0px 4px 4px rgba(0,0,0,.1)",
+          filter: "drop-shadow(0px 4px 4px rgba(0,0,0,.5))",
         },
 
         "& .name": {
@@ -176,7 +177,9 @@ const ControlMatch: React.FC<RouteComponentProps> = ({ history }) => {
 
   return (
     <Sheet loading={loading}>
-      <SheetHead color="orange">Match</SheetHead>
+      <SheetHead color="orange">
+        <SheetHeadTitle>Match</SheetHeadTitle>
+      </SheetHead>
       <SheetBody>
         <RadioButton
           checked={match_live}
@@ -247,8 +250,9 @@ const ControlMatch: React.FC<RouteComponentProps> = ({ history }) => {
           )}
         </SheetSection>
         <SheetSection style={{ padding: 0 }}>
-          <Accordion style={{ boxShadow: "none" }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Accordion expanded style={{ boxShadow: "none" }}>
+            {/* <AccordionSummary expandIcon={<ExpandMoreIcon />}> */}
+            <AccordionSummary>
               <Typography variant="h4">Schedule</Typography>
             </AccordionSummary>
 

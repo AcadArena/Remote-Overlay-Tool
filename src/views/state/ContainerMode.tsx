@@ -7,17 +7,20 @@ import SheetBody from "../../comps/sheet/SheetBody";
 import SheetHead from "../../comps/sheet/SheetHead";
 import SheetHeadTitle from "../../comps/sheet/SheetHeadTitle";
 import { ReduxState } from "../../config/types/types";
+import FolderIcon from "@material-ui/icons/Folder";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
 
 const ContainerMode = () => {
   const ws = React.useContext(wsContext);
-  const { container_mode } = useSelector((state: ReduxState) => state.live);
+  const { container_mode, room } = useSelector(
+    (state: ReduxState) => state.live
+  );
   const mode = (mode: string) => () => {
     ws.setLiveSettings({ container_mode: mode });
   };
   return (
     <Sheet>
-      <SheetHead>
+      <SheetHead icon={<FolderIcon />}>
         <SheetHeadTitle>Container Modes</SheetHeadTitle>
       </SheetHead>
       <SheetBody>
@@ -30,18 +33,20 @@ const ContainerMode = () => {
           <RadioButton
             label="Bracket"
             checked={container_mode === "bracket"}
-            disabled
+            // disabled
             onClick={mode("bracket")}
           />
           <RadioButton
             label="Standings Group A"
             checked={container_mode === "standings_group_a"}
             onClick={mode("standings_group_a")}
+            disabled={room !== "uac"}
           />
           <RadioButton
             label="Standings Group B"
             checked={container_mode === "standings_group_b"}
             onClick={mode("standings_group_b")}
+            disabled={room !== "uac"}
           />
           <RadioButton
             label="Team Vs Team"

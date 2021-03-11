@@ -77,6 +77,7 @@ const makeCompStyles = makeStyles((theme) => ({
         backgroundSize: "contain",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
+        filter: "drop-shadow(0px 4px 4px rgba(0,0,0,.5))",
       },
     },
 
@@ -562,7 +563,9 @@ const MatchesSelection = () => {
                                   backgroundImage: `url(${getTeamLogo(
                                     match?.player2_id
                                   )})`,
-                                  border: Boolean(getTeamLogo(match?.playe2_id))
+                                  border: Boolean(
+                                    getTeamLogo(match?.player2_id)
+                                  )
                                     ? "none"
                                     : "",
                                 }}

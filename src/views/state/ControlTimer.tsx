@@ -1,4 +1,4 @@
-import { Button, TextField } from "@material-ui/core";
+import { Button, makeStyles, TextField } from "@material-ui/core";
 import React from "react";
 import { useSelector } from "react-redux";
 import Sheet from "../../comps/sheet/Sheet";
@@ -13,8 +13,26 @@ import {
   KeyboardTimePicker,
 } from "@material-ui/pickers";
 
+import QueryBuilderIcon from "@material-ui/icons/QueryBuilder";
+import PauseIcon from "@material-ui/icons/Pause";
+import PlayArrowIcon from "@material-ui/icons/PlayArrow";
+
+const makeComponentStyles = makeStyles((theme) => ({
+  timer: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    "& > *": {
+      margin: 10,
+    },
+  },
+}));
+
 const ControlTimer = () => {
+  const classes = makeComponentStyles();
   const ws = React.useContext(wsContext);
+
   const { room, countdown_minutes } = useSelector(
     (state: ReduxState) => state.live
   );
@@ -39,12 +57,16 @@ const ControlTimer = () => {
     setSelectedDate(date);
   };
 
+  const reset = () => {
+    ws.setLiveSettings({ countdown_minutes: new Date() });
+  };
+
   return (
     <Sheet>
-      <SheetHead color="green">
+      <SheetHead color="green" icon={<QueryBuilderIcon />}>
         <SheetHeadTitle>Timer</SheetHeadTitle>
       </SheetHead>
-      <SheetBody style={{ display: "flex", alignItems: "center" }}>
+      <SheetBody className={classes.timer}>
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <KeyboardTimePicker
             margin="normal"
@@ -60,40 +82,44 @@ const ControlTimer = () => {
         </MuiPickersUtilsProvider>
 
         <Button
-          variant="contained"
+          variant="outlined"
           style={{ marginLeft: 10 }}
+          startIcon={<QueryBuilderIcon />}
           onClick={setCoundownMinutes}
         >
           Set
         </Button>
         {/* <Button
-          variant="contained"
+          variant="outlined"
           style={{ marginLeft: 10 }}
           onClick={timeCommand("start")}
         >
           Start
         </Button> */}
         <Button
-          variant="contained"
+          variant="outlined"
           style={{ marginLeft: 10 }}
           onClick={timeCommand("pause")}
+          startIcon={<PauseIcon />}
         >
           Pause
         </Button>
         <Button
-          variant="contained"
+          variant="outlined"
           style={{ marginLeft: 10 }}
           onClick={timeCommand("resume")}
+          startIcon={<PlayArrowIcon />}
         >
           Resume
         </Button>
-        {/* <Button
+        <Button
           variant="contained"
           style={{ marginLeft: 10 }}
-          onClick={timeCommand("restart")}
+          onClick={reset}
+          color="secondary"
         >
-          Restart
-        </Button> */}
+          RESET
+        </Button>
       </SheetBody>
     </Sheet>
   );

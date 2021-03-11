@@ -25,9 +25,10 @@ import LinkIcon from "@material-ui/icons/Link";
 import ChromeReaderModeIcon from "@material-ui/icons/ChromeReaderMode";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import clsx from "clsx";
-import { ReduxState } from "../../config/types/types";
+import { Participant, ReduxState } from "../../config/types/types";
 import { useSelector } from "react-redux";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
+import ControlCameraIcon from "@material-ui/icons/ControlCamera";
 
 const drawerWdith = 260;
 
@@ -90,6 +91,18 @@ const makeComponentStyles = makeStyles((theme) => ({
       padding: theme.spacing(3, 3, 0, 3),
     },
   },
+  winner: {
+    display: "flex",
+    textAlign: "center",
+    flexDirection: "column",
+    margin: "10px 0",
+    padding: 10,
+    borderRadius: 5,
+    border: "1px solid rgba(0,0,0,.2)",
+    "& .teams": {
+      display: "flex",
+    },
+  },
 }));
 
 const navData = [
@@ -112,9 +125,9 @@ const navData = [
   // },
   { title: "Casters", url: "/casters", icon: <HeadsetMicIcon /> },
   { title: "Lower Thirds", url: "/lowerthirds", icon: <CallToActionIcon /> },
-  { title: "Timer", url: "/timer", icon: <AccessTimeIcon /> },
+  { title: "State", url: "/state", icon: <ControlCameraIcon /> },
   { title: "Stats", url: "/stats", icon: <BarChartIcon /> },
-  { title: "Container", url: "/container", icon: <ChromeReaderModeIcon /> },
+  // { title: "Container", url: "/container", icon: <ChromeReaderModeIcon /> },
   { title: "Links", url: "/links", icon: <LinkIcon /> },
 ];
 
@@ -124,10 +137,40 @@ const Nav: React.FC<RouteComponentProps> = ({
 }) => {
   const classes = makeComponentStyles();
   const [anchorEl, setAnchorEl] = React.useState<any>(null);
-  const { websocket_users, room, swap_team_positions = false } = useSelector(
-    (state: ReduxState) => state.live
-  );
+  const {
+    websocket_users,
+    room,
+    swap_team_positions = false,
+    match,
+    tournament,
+    match_winner,
+  } = useSelector((state: ReduxState) => state.live);
+  const [selected, setSelected] = React.useState<Participant | undefined>();
+
   const ws = React.useContext(wsContext);
+
+  const team = (id?: number) => {
+    return tournament?.participants?.find((p) => p.id === (id ?? 0));
+  };
+
+  const goLive = () => {
+    ws.setLiveSettings({
+      match_winner: {
+        live: true,
+        team: selected,
+      },
+    });
+  };
+
+  const clear = () => {
+    ws.setLiveSettings({
+      match_winner: {
+        live: false,
+        team: selected,
+      },
+    });
+    setSelected(undefined);
+  };
 
   return (
     <Drawer
@@ -158,6 +201,45 @@ const Nav: React.FC<RouteComponentProps> = ({
         </List>
 
         <div style={{ padding: 20 }}>
+          <div className={classes.winner}>
+            <Typography variant="h4">Round Winner</Typography>
+
+            <div className="teams">
+              <Button
+                onClick={() => setSelected(team(match?.player1_id))}
+                variant={
+                  selected === team(match?.player1_id) ? "outlined" : "text"
+                }
+              >
+                {team(match?.player1_id)?.org_name}
+              </Button>
+              <Button
+                onClick={() => setSelected(team(match?.player2_id))}
+                variant={
+                  selected === team(match?.player2_id) ? "outlined" : "text"
+                }
+              >
+                {team(match?.player2_id)?.org_name}
+              </Button>
+            </div>
+
+            <div
+              style={{ margin: 10, display: "flex", flexDirection: "column" }}
+            >
+              <Typography variant="caption">Double click to go live</Typography>
+              <Button
+                color={match_winner?.live ? "secondary" : "primary"}
+                variant="contained"
+                onDoubleClick={goLive}
+                disabled={!Boolean(selected)}
+              >
+                Go Live
+              </Button>
+              <Button variant="outlined" onClick={clear}>
+                clear
+              </Button>
+            </div>
+          </div>
           <Button
             fullWidth
             color="primary"
