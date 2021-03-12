@@ -168,7 +168,14 @@ const MatchesSelection = () => {
       .then(({ data }) => {
         if (isMounted) {
           setLoading(false);
-          setMatches(data.map((d) => d.match));
+          setMatches(
+            data.map((d) => ({
+              ...d.match,
+              veto: [],
+              badge: "",
+              bestOf: d.match.scores_csv.split(",").length || 1,
+            }))
+          );
         }
       })
       .catch((err) => {
