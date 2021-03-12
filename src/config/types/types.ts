@@ -207,6 +207,7 @@ export interface Match {
   veto?: VetoItem[];
   badge?: string;
   schedule?: Date;
+  bestOf?: number;
   [key: string]: any;
 }
 
