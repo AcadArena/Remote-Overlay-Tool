@@ -19,12 +19,14 @@ import LinkPage from "./views/links/LinkPage";
 import { wsContext } from "./config/websocket/WebsocketProvider";
 import ContainerPage from "./views/container/ContainerPage";
 import StatePage from "./views/state/StatePage";
+import MatchesWidget from "./comps/widget/MatchesWidget";
 
 const makeComponentStyles = makeStyles((theme) => ({
   app: {
     display: "flex",
     height: "100vh",
     width: "100vw",
+    overflowX: "hidden",
   },
   mainPanel: {
     height: "100%",
@@ -43,7 +45,7 @@ const makeComponentStyles = makeStyles((theme) => ({
 function App() {
   const classes = makeComponentStyles();
   const ws = React.useContext(wsContext);
-  const { tournament, websocket_users } = useSelector(
+  const { tournament, websocket_users, match, matches_today } = useSelector(
     (state: ReduxState) => state.live
   );
 
@@ -86,6 +88,9 @@ function App() {
                 </Route>
               </Switch>
             </div>
+            {(Boolean(match) || Boolean(matches_today?.length)) && (
+              <MatchesWidget />
+            )}
           </>
         ) : (
           <>

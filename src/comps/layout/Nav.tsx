@@ -99,6 +99,9 @@ const makeComponentStyles = makeStyles((theme) => ({
     padding: 10,
     borderRadius: 5,
     border: "1px solid rgba(0,0,0,.2)",
+    [theme.breakpoints.down("md")]: {
+      display: "none",
+    },
     "& .teams": {
       display: "flex",
     },
@@ -149,8 +152,10 @@ const Nav: React.FC<RouteComponentProps> = ({
 
   const ws = React.useContext(wsContext);
 
-  const team = (id?: number) => {
-    return tournament?.participants?.find((p) => p.id === (id ?? 0));
+  const team = (id: number) => {
+    return tournament?.participants?.find(
+      (p) => p.id === id || p.group_player_ids.includes(id)
+    );
   };
 
   const goLive = () => {
@@ -206,20 +211,24 @@ const Nav: React.FC<RouteComponentProps> = ({
 
             <div className="teams">
               <Button
-                onClick={() => setSelected(team(match?.player1_id))}
+                onClick={() => setSelected(team(match?.player1_id ?? 0))}
                 variant={
-                  selected === team(match?.player1_id) ? "outlined" : "text"
+                  selected === team(match?.player1_id ?? 0)
+                    ? "outlined"
+                    : "text"
                 }
               >
-                {team(match?.player1_id)?.org_name}
+                {team(match?.player1_id ?? 0)?.org_name}
               </Button>
               <Button
-                onClick={() => setSelected(team(match?.player2_id))}
+                onClick={() => setSelected(team(match?.player2_id ?? 0))}
                 variant={
-                  selected === team(match?.player2_id) ? "outlined" : "text"
+                  selected === team(match?.player2_id ?? 0)
+                    ? "outlined"
+                    : "text"
                 }
               >
-                {team(match?.player2_id)?.org_name}
+                {team(match?.player2_id ?? 0)?.org_name}
               </Button>
             </div>
 

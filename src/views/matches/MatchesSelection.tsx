@@ -17,7 +17,7 @@ import { projectFirestore as db } from "../../config/firebase/config";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
 import SaveIcon from "@material-ui/icons/Save";
 import CheckIcon from "@material-ui/icons/Check";
-import ControlMatchPopup from "./MatchPopup";
+import ControlMatchPopup from "../../comps/dialogs/ControlMatchPopup";
 
 export const getFinalScore = (score: string) => {
   const scores: string[] = score.split(",");
@@ -133,6 +133,11 @@ const makeCompStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     fontWeight: "bold",
+  },
+  hiddenWhenBig: {
+    [theme.breakpoints.up("md")]: {
+      display: "none",
+    },
   },
 }));
 
@@ -277,6 +282,7 @@ const MatchesSelection = () => {
         {/* SelectedMatch */}
         {matchWS && (
           <SheetSection
+            className={classes.hiddenWhenBig}
             style={{
               border: "1px solid rgba(0, 172, 193, 1)",
             }}
@@ -333,7 +339,10 @@ const MatchesSelection = () => {
         )}
 
         {/* SCHEDULE */}
-        <SheetSection style={{ border: "1px solid rgba(255, 152, 0, 1)" }}>
+        <SheetSection
+          className={classes.hiddenWhenBig}
+          style={{ border: "1px solid rgba(255, 152, 0, 1)" }}
+        >
           <Typography variant="h4">Schedule</Typography>
           <div className={classes.schedule}>
             {matches_today.length

@@ -9,6 +9,8 @@ interface SheetHead {
   color?: Color;
   align?: "right" | "left";
   className?: string;
+  iconProps?: any;
+  contentProps?: any;
   [key: string]: any;
 }
 
@@ -99,14 +101,22 @@ const SheetHead: React.FC<SheetHead> = ({
   color,
   align,
   className,
+  iconProps,
+  contentProps,
   ...props
 }) => {
   const classes = makeComponentStyles({ color, align, icon });
 
   return (
     <div className={classes.sheetHead + " " + className} {...props}>
-      {icon && <div className={classes.icon}>{icon}</div>}
-      <div className={classes.sheetHeadContent}>{children}</div>
+      {icon && (
+        <div className={classes.icon} {...iconProps}>
+          {icon}
+        </div>
+      )}
+      <div className={classes.sheetHeadContent} {...contentProps}>
+        {children}
+      </div>
     </div>
   );
 };

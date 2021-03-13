@@ -287,6 +287,7 @@ const ControlMatchPopupVeto: React.FC<{
               {Boolean(match?.veto?.length) ? (
                 match?.veto?.map((v: VetoItem, i: number) => (
                   <div
+                    key={i}
                     style={{
                       display: "flex",
                       alignItems: "center",

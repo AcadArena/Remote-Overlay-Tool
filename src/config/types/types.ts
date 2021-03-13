@@ -201,6 +201,7 @@ export interface Match {
   underway_at: null | string;
   optional: boolean | null;
   completed_at: string;
+  is_completed?: boolean;
   suggested_play_order: number;
   prerequisite_match_ids_csv: string;
   scores_csv: string;

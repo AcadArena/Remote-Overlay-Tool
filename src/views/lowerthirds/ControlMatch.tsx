@@ -21,7 +21,7 @@ import swal from "sweetalert";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { projectFirestore } from "../../config/firebase/config";
-import ControlMatchPopup from "./ControlMatchPopup";
+import ControlMatchPopup from "../../comps/dialogs/ControlMatchPopup";
 import RadioButton from "../../comps/radiobutton/RadioButton";
 import SheetHeadTitle from "../../comps/sheet/SheetHeadTitle";
 
@@ -89,6 +89,11 @@ const ms = makeStyles((theme) => ({
       "&:hover": {
         backgroundColor: "#f9f9f9",
       },
+    },
+  },
+  hiddenWhenBig: {
+    [theme.breakpoints.up("md")]: {
+      display: "none",
     },
   },
 }));
@@ -194,7 +199,10 @@ const ControlMatch: React.FC<RouteComponentProps> = ({ history }) => {
         >
           Go to matches
         </Button>
-        <SheetSection style={{ border: "1px solid rgba(0,0,0,.25)" }}>
+        <SheetSection
+          className={c.hiddenWhenBig}
+          style={{ border: "1px solid rgba(0,0,0,.25)" }}
+        >
           <Typography variant="h4">Current Match</Typography>
           <div style={{ display: "flex" }}>
             <Button
@@ -249,7 +257,7 @@ const ControlMatch: React.FC<RouteComponentProps> = ({ history }) => {
             "No Match Selected"
           )}
         </SheetSection>
-        <SheetSection style={{ padding: 0 }}>
+        <SheetSection className={c.hiddenWhenBig} style={{ padding: 0 }}>
           <Accordion expanded style={{ boxShadow: "none" }}>
             {/* <AccordionSummary expandIcon={<ExpandMoreIcon />}> */}
             <AccordionSummary>
