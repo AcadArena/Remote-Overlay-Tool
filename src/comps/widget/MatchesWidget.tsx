@@ -6,6 +6,7 @@ import SheetHeadTitle from "../sheet/SheetHeadTitle";
 import { ReactComponent as BattleIcon } from "../assets/battle.svg";
 import SheetSection from "../sheet/SheetSection";
 import { useSelector } from "react-redux";
+import InfoIcon from "@material-ui/icons/Info";
 import { Match, ReduxState } from "../../config/types/types";
 import {
   makeStyles,
@@ -16,7 +17,10 @@ import {
   Tabs,
   Tab,
 } from "@material-ui/core";
-import ControlMatchPopup from "../dialogs/ControlMatchPopup";
+import ControlMatchPopup from "../dialogs/MatchPopup";
+import SheetFooter from "../sheet/SheetFooter";
+import swal from "sweetalert";
+import { wsContext } from "../../config/websocket/WebsocketProvider";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -37,7 +41,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box paddingY={3}>
+        <Box paddingTop={3}>
           <Typography>{children}</Typography>
         </Box>
       )}
@@ -177,10 +181,26 @@ const MatchesWidget = () => {
   );
   const [matchSelected, setMatchSelected] = React.useState<Match | undefined>();
   const [state, setState] = React.useState<boolean>(true);
+  const ws = React.useContext(wsContext);
 
-  const openMatchDialog = (m?: Match) => () => {
-    setMatchSelected(m);
-    setMatchDialogState(true);
+  const openMatchDialog = (m?: Match) => ({ ctrlKey }: React.MouseEvent) => {
+    if (ctrlKey) {
+      swal({
+        title: "Remove match schedule?",
+        icon: "warning",
+        dangerMode: true,
+        buttons: ["Cancel", true],
+      }).then((value) => {
+        if (value) {
+          ws.setLiveSettings({
+            matches_today: matches_today?.filter((mm) => mm.id !== m?.id),
+          });
+        }
+      });
+    } else {
+      setMatchSelected(m);
+      setMatchDialogState(true);
+    }
   };
 
   const toggle = () => {
@@ -341,6 +361,12 @@ const MatchesWidget = () => {
         }`}
         match={matchSelected}
       ></ControlMatchPopup>
+      {state && (
+        <SheetFooter>
+          <InfoIcon />
+          <strong>[ CTRL + CLICK ]:</strong>&nbsp;Remove match from schedule
+        </SheetFooter>
+      )}
     </Sheet>
   );
 };
