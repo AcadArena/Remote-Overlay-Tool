@@ -1,24 +1,34 @@
-import { Button, Dialog, makeStyles, Typography } from "@material-ui/core";
+import {
+  Button,
+  Dialog,
+  Grid,
+  makeStyles,
+  Typography,
+  FormControlLabel,
+  Switch,
+} from "@material-ui/core";
 import React from "react";
 import { useSelector } from "react-redux";
-import Sheet from "../../comps/sheet/Sheet";
-import SheetBody from "../../comps/sheet/SheetBody";
-import SheetHead from "../../comps/sheet/SheetHead";
-import SheetHeadSub from "../../comps/sheet/SheetHeadSub";
-import SheetHeadTitle from "../../comps/sheet/SheetHeadTitle";
+import Sheet from "../sheet/Sheet";
+import SheetBody from "../sheet/SheetBody";
+import SheetHead from "../sheet/SheetHead";
+import SheetHeadSub from "../sheet/SheetHeadSub";
+import SheetHeadTitle from "../sheet/SheetHeadTitle";
 import { Match, ReduxState } from "../../config/types/types";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
 import axios from "axios";
 import { projectFirestore } from "../../config/firebase/config";
+import InfoIcon from "@material-ui/icons/Info";
 import swal from "sweetalert";
-import SheetSection from "../../comps/sheet/SheetSection";
-import TextField from "../../comps/textfield/TextField";
-import ControlMatchPopupVeto from "./ControlMatchPopupVeto";
+import SheetSection from "../sheet/SheetSection";
+import TextField from "../textfield/TextField";
+import ControlMatchPopupVeto from "./MatchVeto";
 import {
   KeyboardDateTimePicker,
   MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
+import SheetFooter from "../sheet/SheetFooter";
 interface ControlMatchPopupProps {
   open: boolean;
   match?: Match;
@@ -63,6 +73,8 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
   const [scores, setScores] = React.useState<string>("0-0");
   const [vetoState, setVetoState] = React.useState<boolean>(false);
   const [badge, setBadge] = React.useState<string>("");
+  const [bestOf, setBestOf] = React.useState<number>(1);
+  const [isCompleted, setIsCompleted] = React.useState<boolean>(false);
   const [scheduleDate, setScheduleDate] = React.useState<Date | null>(
     new Date()
   );
@@ -188,6 +200,8 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
                 scores_csv: scores,
                 badge: badge,
                 schedule: scheduleDate,
+                bestOf: bestOf,
+                is_completed: isCompleted,
               }
             : m
         ),
@@ -203,6 +217,8 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
                     scores_csv: scores,
                     badge: badge,
                     schedule: scheduleDate,
+                    bestOf: bestOf,
+                    is_completed: isCompleted,
                   }
                 : m
             ),
@@ -214,6 +230,8 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
                   scores_csv: scores,
                   badge: badge,
                   schedule: scheduleDate,
+                  bestOf: bestOf,
+                  is_completed: isCompleted,
                 }
               : m
           ),
@@ -224,6 +242,8 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
                   scores_csv: scores,
                   badge: badge,
                   schedule: scheduleDate,
+                  bestOf: bestOf,
+                  is_completed: isCompleted,
                 }
               : matchWS,
         });
@@ -242,6 +262,8 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
                     scores_csv: scores,
                     badge: badge,
                     schedule: scheduleDate,
+                    bestOf: bestOf,
+                    is_completed: isCompleted,
                   }
                 : m
             ),
@@ -253,6 +275,8 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
                   scores_csv: scores,
                   badge: badge,
                   schedule: scheduleDate,
+                  bestOf: bestOf,
+                  is_completed: isCompleted,
                 }
               : m
           ),
@@ -263,6 +287,8 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
                   scores_csv: scores,
                   badge: badge,
                   schedule: scheduleDate,
+                  bestOf: bestOf,
+                  is_completed: isCompleted,
                 }
               : matchWS,
         });
@@ -285,6 +311,10 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
     setScheduleDate(date);
   };
 
+  const addMatchToSchedule = () => {
+    ws.setLiveSettings({ matches_today: [...(matches_today ?? []), match] });
+  };
+
   return (
     <Dialog open={open} classes={{ paper: c.dialog }} onClose={onClose}>
       <Sheet loading={loading}>
@@ -299,21 +329,34 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
               color="primary"
               variant="contained"
               onClick={selectMatch}
-              style={{ marginRight: 10 }}
+              style={{ margin: 10 }}
               disabled={match?.id === matchWS?.id}
             >
               Select This Match
             </Button>
             <Button
+              color="primary"
+              variant="contained"
+              onClick={addMatchToSchedule}
+              style={{ margin: 10 }}
+              disabled={Boolean(matches_today?.find((m) => m.id === match?.id))}
+            >
+              Add to Schedule
+            </Button>
+            <Button
               color="secondary"
               variant="contained"
               onClick={refresh}
-              style={{ marginRight: 10 }}
+              style={{ margin: 10 }}
             >
               Fetch Score
             </Button>
-            <Button variant="contained" onClick={() => setVetoState(true)}>
-              Veto
+            <Button
+              variant="contained"
+              onClick={() => setVetoState(true)}
+              style={{ margin: 10 }}
+            >
+              Veto ({match?.veto?.length ?? 0})
             </Button>
           </SheetSection>
 
@@ -351,24 +394,58 @@ const ControlMatchPopup: React.FC<ControlMatchPopupProps> = ({
             </Button>
           </SheetSection>
           <SheetSection>
-            <Typography variant="h4">📆 Schedule</Typography>
+            <Typography variant="h4">🖊️ Info</Typography>
             {/* <TextField
               value={badge}
               onChange={({ currentTarget: { value } }) => setBadge(value)}
             /> */}
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <KeyboardDateTimePicker
-                margin="normal"
-                id="date-picker-dialog"
-                label="Date picker dialog"
-                format="MM/dd/yyyy — hh:mm a"
-                value={scheduleDate}
-                onChange={handleDateChange}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
-            </MuiPickersUtilsProvider>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item sm={12} md={5}>
+                <TextField
+                  label="Best Of"
+                  type="number"
+                  value={bestOf}
+                  size="small"
+                  onChange={({ currentTarget: { value } }) =>
+                    setBestOf(
+                      parseInt(value) < 1
+                        ? 1
+                        : parseInt(value) > 7
+                        ? 7
+                        : parseInt(value)
+                    )
+                  }
+                />
+              </Grid>
+              <Grid item sm={12} md={7}>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                  <KeyboardDateTimePicker
+                    margin="normal"
+                    id="date-picker-dialog"
+                    label="Match Schedule"
+                    format="MM/dd/yyyy — hh:mm a"
+                    value={scheduleDate}
+                    onChange={handleDateChange}
+                    KeyboardButtonProps={{
+                      "aria-label": "change date",
+                    }}
+                  />
+                </MuiPickersUtilsProvider>
+              </Grid>
+            </Grid>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isCompleted}
+                  onChange={({ target: { checked } }) =>
+                    setIsCompleted(checked)
+                  }
+                  name="checkedA"
+                  color="primary"
+                />
+              }
+              label="Match is finished"
+            />
           </SheetSection>
           <Button
             variant="contained"

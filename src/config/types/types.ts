@@ -217,16 +217,17 @@ export interface VetoItem {
     org_name: string;
     university_name: string;
     university_acronym: string;
+    org_acronym: string;
     logo: string;
   };
   type: "ban" | "pick";
   map: ValorantMap;
   winner?: {
     org_name: string;
-    university_name: string;
     university_acronym: string;
+    university_name: string;
     logo: string;
-  };
+  } | null;
 }
 
 export type ValorantMap = "ascent" | "bind" | "haven" | "icebox" | "split";

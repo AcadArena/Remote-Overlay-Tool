@@ -17,7 +17,7 @@ import { projectFirestore as db } from "../../config/firebase/config";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
 import SaveIcon from "@material-ui/icons/Save";
 import CheckIcon from "@material-ui/icons/Check";
-import ControlMatchPopup from "../../comps/dialogs/ControlMatchPopup";
+import ControlMatchPopup from "../../comps/dialogs/MatchPopup";
 
 export const getFinalScore = (score: string) => {
   const scores: string[] = score.split(",");

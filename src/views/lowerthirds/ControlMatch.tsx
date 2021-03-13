@@ -21,7 +21,7 @@ import swal from "sweetalert";
 import { wsContext } from "../../config/websocket/WebsocketProvider";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { projectFirestore } from "../../config/firebase/config";
-import ControlMatchPopup from "../../comps/dialogs/ControlMatchPopup";
+import ControlMatchPopup from "../../comps/dialogs/MatchPopup";
 import RadioButton from "../../comps/radiobutton/RadioButton";
 import SheetHeadTitle from "../../comps/sheet/SheetHeadTitle";
 

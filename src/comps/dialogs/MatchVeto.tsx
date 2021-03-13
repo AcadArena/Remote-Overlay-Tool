@@ -14,12 +14,12 @@ import {
 } from "@material-ui/core";
 import React from "react";
 import { useSelector } from "react-redux";
-import Sheet from "../../comps/sheet/Sheet";
-import SheetBody from "../../comps/sheet/SheetBody";
-import SheetHead from "../../comps/sheet/SheetHead";
-import SheetHeadSub from "../../comps/sheet/SheetHeadSub";
-import SheetHeadTitle from "../../comps/sheet/SheetHeadTitle";
-import SheetSection from "../../comps/sheet/SheetSection";
+import Sheet from "../sheet/Sheet";
+import SheetBody from "../sheet/SheetBody";
+import SheetHead from "../sheet/SheetHead";
+import SheetHeadSub from "../sheet/SheetHeadSub";
+import SheetHeadTitle from "../sheet/SheetHeadTitle";
+import SheetSection from "../sheet/SheetSection";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import CancelIcon from "@material-ui/icons/Cancel";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
@@ -43,6 +43,7 @@ const mcs = makeStyles((theme) => ({
   paper: {
     backgroundColor: "transparent",
     boxShadow: "none",
+    width: theme.breakpoints.values.md,
   },
   add: {
     display: "flex",
@@ -86,6 +87,7 @@ const ControlMatchPopupVeto: React.FC<{
       org_name: "",
       university_name: "",
       university_acronym: "",
+      org_acronym: "",
       logo: "",
     },
     type: "ban",
@@ -94,12 +96,20 @@ const ControlMatchPopupVeto: React.FC<{
   const ws = React.useContext(wsContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [anchorEl2, setAnchorEl2] = React.useState<null | HTMLElement>(null);
+  const [
+    winnerAnchorEl,
+    setWinnerAnchorEl,
+  ] = React.useState<null | HTMLElement>(null);
   const [loading, setLoading] = React.useState<boolean>(false);
+
   const teamSelection = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const mapSelection = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl2(event.currentTarget);
+  };
+  const winnerSelection = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setWinnerAnchorEl(event.currentTarget);
   };
 
   const closeMapSelection = () => {
@@ -107,6 +117,9 @@ const ControlMatchPopupVeto: React.FC<{
   };
   const closeTeamSelection = () => {
     setAnchorEl(null);
+  };
+  const closeWinnerSelection = () => {
+    setWinnerAnchorEl(null);
   };
 
   const mapPool: ("ascent" | "bind" | "haven" | "icebox" | "split")[] = [
@@ -127,6 +140,7 @@ const ControlMatchPopupVeto: React.FC<{
     org_name: team(match?.player1_id)?.org_name ?? "",
     university_name: team(match?.player1_id)?.university_name ?? "",
     university_acronym: team(match?.player1_id)?.university_acronym ?? "",
+    org_acronym: team(match?.player1_id)?.org_acronym ?? "",
     logo: team(match?.player1_id)?.logo ?? "",
   };
 
@@ -134,6 +148,7 @@ const ControlMatchPopupVeto: React.FC<{
     org_name: team(match?.player2_id)?.org_name ?? "",
     university_name: team(match?.player2_id)?.university_name ?? "",
     university_acronym: team(match?.player2_id)?.university_acronym ?? "",
+    org_acronym: team(match?.player2_id)?.org_acronym ?? "",
     logo: team(match?.player2_id)?.logo ?? "",
   };
 
@@ -141,6 +156,7 @@ const ControlMatchPopupVeto: React.FC<{
     org_name: "AUTO",
     university_name: "AUTO",
     university_acronym: "AUTO",
+    org_acronym: "AUTO",
     logo: "",
   };
 
@@ -152,10 +168,88 @@ const ControlMatchPopupVeto: React.FC<{
     org_name: string;
     university_name: string;
     university_acronym: string;
+    org_acronym: string;
     logo: string;
   }) => () => {
     setForm({ ...form, team: team });
     closeTeamSelection();
+  };
+  const selectWinner = (
+    team: {
+      org_name: string;
+      university_name: string;
+      university_acronym: string;
+      org_acronym: string;
+      logo: string;
+    } | null,
+    index: number
+  ) => () => {
+    // setForm({ ...form, winner: team });
+    setLoading(true);
+    projectFirestore
+      .collection("tournaments")
+      .doc(tournament?.url)
+      .set({
+        ...tournament,
+        matches: tournament?.matches.map((m) =>
+          m.id === match?.id
+            ? {
+                ...m,
+                veto: m.veto?.map((v, i) =>
+                  i === index ? { ...v, winner: team } : v
+                ),
+              }
+            : m
+        ),
+      })
+      .then(() => {
+        setLoading(false);
+        ws.setLiveSettings({
+          tournament: {
+            ...tournament,
+            matches: tournament?.matches.map((m) =>
+              m.id === match?.id
+                ? {
+                    ...m,
+                    veto: m.veto?.map((v, i) =>
+                      i === index ? { ...v, winner: team } : v
+                    ),
+                  }
+                : m
+            ),
+          },
+          match:
+            matchWS?.id === match?.id
+              ? {
+                  ...matchWS,
+                  veto: matchWS?.veto?.map((v, i) =>
+                    i === index ? { ...v, winner: team } : v
+                  ),
+                }
+              : matchWS,
+          matches_today: matches_today?.map((m) =>
+            m.id === match?.id
+              ? {
+                  ...m,
+                  veto: m.veto?.map((v, i) =>
+                    i === index ? { ...v, winner: team } : v
+                  ),
+                }
+              : m
+          ),
+        });
+        setMatch({
+          ...match,
+          veto: match.veto?.map((v: VetoItem, i: number) =>
+            i === index ? { ...v, winner: team } : v
+          ),
+        });
+      })
+      .catch((err) => {
+        setLoading(false);
+        swal({ title: "Something Went Wrong", icon: "error" });
+      });
+    closeWinnerSelection();
   };
 
   const selectMap = (map: ValorantMap) => () => {
@@ -297,22 +391,71 @@ const ControlMatchPopupVeto: React.FC<{
                     <Breadcrumbs separator={<NavigateNextIcon />}>
                       <div className={c.flex}>
                         <Avatar variant="rounded" src={v.team.logo} />
-                        <div className="name">
-                          {v.team.university_acronym} | {v.team.org_name}
-                        </div>
+                        <div className="name">{v.team.org_acronym}</div>
                       </div>
                       <div className={c.flex}>
                         {v.type === "ban" ? (
-                          <CancelIcon />
+                          <CancelIcon color="secondary" />
                         ) : (
-                          <CheckCircleIcon />
+                          <CheckCircleIcon color="primary" />
                         )}
-                        <div className="name">{v.type}</div>
+                        {/* <div className="name">{v.type}</div> */}
                       </div>
                       <div className={c.flex}>
                         <Avatar variant="rounded" src={maps[v.map]} />
-                        <div className="name">{v.map}</div>
+                        <div
+                          className="name"
+                          style={{ textTransform: "capitalize" }}
+                        >
+                          {v.map}
+                        </div>
                       </div>
+                      {v.type === "pick" && (
+                        <div>
+                          <Button
+                            variant="outlined"
+                            aria-controls="simple-menu"
+                            aria-haspopup="true"
+                            onClick={winnerSelection}
+                            // style={{ width: 225, justifyContent: "flex-start" }}
+                            startIcon={
+                              v.winner?.logo ? (
+                                <Avatar
+                                  variant="rounded"
+                                  src={v.winner?.logo}
+                                />
+                              ) : undefined
+                            }
+                          >
+                            {Boolean(form.team.org_name)
+                              ? form.team.org_name
+                              : "Winner"}
+                          </Button>
+                          <Menu
+                            id="simple-menu"
+                            anchorEl={winnerAnchorEl}
+                            keepMounted
+                            open={Boolean(winnerAnchorEl)}
+                            onClose={closeTeamSelection}
+                          >
+                            <ListItem button onClick={selectWinner(team1, i)}>
+                              <ListItemAvatar>
+                                <Avatar src={team1.logo} />
+                              </ListItemAvatar>
+                              <ListItemText>{team1.org_name}</ListItemText>
+                            </ListItem>
+                            <ListItem button onClick={selectWinner(team2, i)}>
+                              <ListItemAvatar>
+                                <Avatar variant="rounded" src={team2.logo} />
+                              </ListItemAvatar>
+                              <ListItemText>{team2.org_name}</ListItemText>
+                            </ListItem>
+                            <ListItem button onClick={selectWinner(null, i)}>
+                              <ListItemText>No Winner Yet</ListItemText>
+                            </ListItem>
+                          </Menu>
+                        </div>
+                      )}
                     </Breadcrumbs>
                     <div
                       style={{
@@ -402,7 +545,7 @@ const ControlMatchPopupVeto: React.FC<{
               anchorEl={anchorEl2}
               keepMounted
               open={Boolean(anchorEl2)}
-              onClose={closeTeamSelection}
+              onClose={closeMapSelection}
             >
               {mapPool
                 .filter(
